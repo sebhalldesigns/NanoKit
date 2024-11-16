@@ -6,6 +6,7 @@ project(NanoKit)
 # Add subdirectory
 add_subdirectory(Components/NanoDraw)
 add_subdirectory(Components/NanoWin)
+add_subdirectory(Components/NanoGraph)
 
 # Add an executable
 add_executable(NanoKit 
@@ -21,4 +22,5 @@ target_include_directories(NanoKit PRIVATE
 target_link_libraries(NanoKit PRIVATE 
     NanoDraw
     NanoWin
+    NanoGraph
 )
