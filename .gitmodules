@@ -7,3 +7,6 @@
 [submodule "Components/NanoWin"]
 	path = Components/NanoWin
 	url = https://github.com/sebhalldesigns/NanoWin.git
+[submodule "Components/NanoAPI"]
+	path = Components/NanoAPI
+	url = https://github.com/sebhalldesigns/NanoAPI.git
