@@ -1,0 +1,6 @@
+[submodule "kit/NanoUI"]
+	path = kit/NanoUI
+	url = https://github.com/sebhalldesigns/NanoUI.git
+[submodule "kit/NanoWin"]
+	path = kit/NanoWin
+	url = https://github.com/sebhalldesigns/NanoWin.git
