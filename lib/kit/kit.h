@@ -1,21 +1,28 @@
 /***************************************************************
 **
-** NanoKit Library Source File
+** NanoKit Library Header File
 **
-** File         :  sys.c
-** Module       :  sys
+** File         :  kit.h
+** Module       :  kit
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Application system management
+** Description  :  Kit lifecycle management
 **
 ***************************************************************/
+
+#ifndef KIT_H
+#define KIT_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include "sys.h"
+#ifdef _WIN32
+    #include <windows.h>
+#endif
+
+#include <stdbool.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -26,17 +33,14 @@
 ***************************************************************/
 
 /***************************************************************
-** MARK: STATIC VARIABLES
+** MARK: FUNCTION DEFS
 ***************************************************************/
 
-/***************************************************************
-** MARK: STATIC FUNCTION DEFS
-***************************************************************/
+#ifdef _WIN32
+    LRESULT CALLBACK Win32WindowProcedure(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+#endif
 
-/***************************************************************
-** MARK: PUBLIC FUNCTIONS
-***************************************************************/
+bool InitKit();
+int RunKit();
 
-/***************************************************************
-** MARK: STATIC FUNCTIONS
-***************************************************************/
+#endif /* KIT_H */

@@ -2,12 +2,12 @@
 **
 ** NanoKit Library Source File
 **
-** File         :  thread.c
-** Module       :  thread
+** File         :  kit.c
+** Module       :  kit
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Cross-platform threading
+** Description  :  Kit lifecycle management
 **
 ***************************************************************/
 
@@ -15,7 +15,11 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include "thread.h"
+#include "kit.h"
+
+#include "../thread/thread.h"
+#include "../log/log.h"
+
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -36,6 +40,26 @@
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
+
+bool InitKit()
+{
+    log_Info("Initializing Kit...");
+
+    if (!InitThread())
+    {
+        log_Error("Failed to initialize Thread API.");
+        return false;
+    }
+
+    return true;
+}
+
+int RunKit()
+{
+    log_Info("Running Kit...");
+
+    return 0;
+}
 
 /***************************************************************
 ** MARK: STATIC FUNCTIONS

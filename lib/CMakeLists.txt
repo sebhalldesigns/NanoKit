@@ -9,3 +9,9 @@ elseif(APPLE)
 elseif(UNIX)
     message(STATUS "Building on Linux/Unix")
 endif()
+
+add_library(NanoKit STATIC 
+    log/log.c
+    kit/kit.c
+    thread/thread_win32.c
+)

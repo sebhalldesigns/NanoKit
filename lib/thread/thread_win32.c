@@ -1,8 +1,8 @@
 /***************************************************************
 **
-** NanoKit Library Header File
+** NanoKit Library Source File
 **
-** File         :  thread.h
+** File         :  thread.c
 ** Module       :  thread
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
@@ -11,14 +11,16 @@
 **
 ***************************************************************/
 
-#ifndef THREAD_H
-#define THREAD_H
-
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdbool.h>
+#include "thread.h"
+
+#include "../log/log.h"
+
+#include <windows.h>
+#include <sysinfoapi.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -29,9 +31,28 @@
 ***************************************************************/
 
 /***************************************************************
-** MARK: FUNCTION DEFS
+** MARK: STATIC VARIABLES
 ***************************************************************/
 
-bool InitThread();
+/***************************************************************
+** MARK: STATIC FUNCTION DEFS
+***************************************************************/
 
-#endif /* THREAD_H */
+/***************************************************************
+** MARK: PUBLIC FUNCTIONS
+***************************************************************/
+
+bool InitThread()
+{
+
+    SYSTEM_INFO sysinfo;
+    GetSystemInfo(&sysinfo);
+
+    log_Info("Initializing Thread API for %d logical processors...", sysinfo.dwNumberOfProcessors);
+
+    return true;
+}
+
+/***************************************************************
+** MARK: STATIC FUNCTIONS
+***************************************************************/

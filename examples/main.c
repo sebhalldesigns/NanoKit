@@ -1,7 +1,9 @@
 #include <stdio.h>
+#include <nanokit.h>
 
 int main()
-{
-    printf("Hello, World!\n");
-    return 0;
+{   
+    InitKit();
+
+    return RunKit();
 }

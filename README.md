@@ -8,6 +8,5 @@ Lightweight, self-contained SDK
 - Constants and compile definitions in ``SCREAMING_SNAKE_CASE``
 - Variables use ``camelCase``
 - Types use ``PascalCase_t``
+- Functions named with ``PascalCase()``
 - Modules named with ``lowercase``
-- Private functions are named in ``PascalCase()``
-- Public functions are prefixed with the module name and an underscore such as ``module_FunctionThatDoesSomething()``
