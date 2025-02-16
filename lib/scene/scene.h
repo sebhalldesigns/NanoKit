@@ -29,6 +29,7 @@
 ***************************************************************/
 
 typedef uintptr_t SceneHandle;
+typedef uintptr_t SceneObjectHandle;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
@@ -36,6 +37,13 @@ typedef uintptr_t SceneHandle;
 
 SceneHandle InitScene();
 void FreeScene(SceneHandle scene);
+
+SceneObjectHandle CreateCube(SceneHandle scene, float x, float y, float z, float size);
+SceneObjectHandle CreateSphere(SceneHandle scene, float x, float y, float z, float radius);
+SceneObjectHandle CreateCylinder(SceneHandle scene, float x, float y, float z, float radius, float height);
+
+
+
 
 
 #endif /* SCENE_H */
