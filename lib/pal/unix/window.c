@@ -54,6 +54,8 @@ static int visual_attribs[] = {
     None
 };
 
+extern const char resources_shaders_shader_frag[];
+
 
 
 /***************************************************************
@@ -92,6 +94,8 @@ WindowHandle InitWindow(const char *title, size_t width, size_t height)
 
     if (!initialized)
     {
+
+        printf("loaded shader frag: %s\n", resources_shaders_shader_frag);
         display = XOpenDisplay(NULL);
         if (!display)
         {

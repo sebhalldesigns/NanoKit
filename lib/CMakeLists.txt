@@ -71,3 +71,12 @@ target_include_directories(NanoKit PUBLIC
     ${CMAKE_CURRENT_SOURCE_DIR}
     
 )
+
+embed_resources(NanoKit
+    resources/fonts/fredoka.ttf
+    resources/fonts/fredoka_semibold.ttf
+    resources/fonts/cousine.ttf
+    resources/fonts/literata.ttf
+    resources/fonts/mrdafoe.ttf
+    resources/shaders/shader.frag
+)
