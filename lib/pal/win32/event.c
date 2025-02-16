@@ -67,7 +67,6 @@ int RunLoop(EventCallback callback)
 
     while (!exitFlag)
     {
-        MSG msg;
         if (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
         {
             if (msg.message == WM_QUIT)

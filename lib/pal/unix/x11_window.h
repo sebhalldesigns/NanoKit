@@ -2,25 +2,29 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  window.h
-** Module       :  window
+** File         :  x11_window.h
+** Module       :  unix
 ** Author       :  SH
-** Created      :  2025-02-13 (YYYY-MM-DD)
+** Created      :  2025-02-16 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Window API
+** Description  :  Unix Window Header
 **
 ***************************************************************/
 
-#ifndef WINDOW_H
-#define WINDOW_H
+#ifndef X11_WINDOW_H
+#define X11_WINDOW_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
+#include <X11/Xlib.h>
+
+#include <extern/glad/glad.h>
+
+#include <GL/gl.h>
+#include <GL/glx.h>
+
 #include <extern/nanovg/src/nanovg.h>
 
 /***************************************************************
@@ -31,27 +35,26 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef uintptr_t WindowHandle;
-
-typedef struct Size
+typedef struct X11Window
 {
-    float width;
-    float height;
-} Size;
-
+    Window window;
+    Atom deleteMessage;
+    GLXContext glContext;
+    NVGcontext *nvg;
+    
+    const char *title;
+    size_t width;
+    size_t height;
+} X11Window;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-WindowHandle InitWindow(const char *title, size_t width, size_t height);
-void FreeWindow(WindowHandle window);
+bool GetWindowFromHandle(Window hwnd, X11Window **window);
+size_t GetNumberOfWindows();
 
-void BeginRender(WindowHandle window);
-void EndRender(WindowHandle window);
+Display *GetDisplay();
 
-NVGcontext *GetNanoVGContext(WindowHandle window);
 
-Size GetWindowSize(WindowHandle window);
-
-#endif /* WINDOW_H */
+#endif /* X11_WINDOW_H */

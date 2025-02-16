@@ -42,6 +42,17 @@ elseif(UNIX)
 
     set(PLATFORM_SOURCE
         pal/unix/thread.c
+        pal/unix/window.c
+        pal/unix/event.c
+
+        extern/glad/glad.c
+        extern/nanovg/src/nanovg.c
+    )
+
+    set(PLATFORM_DEPENDENCIES
+        X11
+        GL
+        m
     )
 
 endif()
