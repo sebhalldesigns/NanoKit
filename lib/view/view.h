@@ -33,6 +33,14 @@
 typedef void (*ViewInitCallback)(void *view);
 typedef void (*ViewResizeCallback)(void *view, Size newSize);
 
+typedef enum 
+{
+    LAYOUT_TYPE_NONE,
+    LAYOUT_TYPE_DOCK,
+    LAYOUT_TYPE_VSTACK,
+    LAYOUT_TYPE_HSTACK
+} ViewLayoutType;
+
 typedef struct ViewClass
 {
     const char *name;
@@ -40,22 +48,23 @@ typedef struct ViewClass
     ViewResizeCallback resizeCallback;
 } ViewClass;
 
-typedef struct 
+typedef struct View
 {
     ViewClass *viewClass;
     Rect frame;
     void *data;
+
+    struct View *parent;
+    struct View *subviews;
+    size_t subviewCount;
+
+    ViewLayoutType layoutType;
+    
 } View;
 
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
-
-void RegisterViewClass(ViewClass *viewClass);
-ViewClass *GetViewClassByName(const char *name);
-
-View *InitView(ViewClass *viewClass);
-void FreeView(View *view);
 
 #endif /* VIEW_H */
