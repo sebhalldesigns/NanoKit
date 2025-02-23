@@ -81,12 +81,12 @@ int RunLoop(EventCallback callback)
                 {
                     printf("Window exposed\n");
 
-                    BeginRender((WindowHandle)window);
+                    BeginPlatformRender((PlatformWindowHandle)window);
 
                     event.type = EVENT_WINDOW_REDRAW;
-                    (eventCallback)((WindowHandle)window, event);
+                    (eventCallback)((PlatformWindowHandle)window, event);
             
-                    EndRender((WindowHandle)window);
+                    EndPlatformRender((PlatformWindowHandle)window);
                 } break;
 
                 case KeyPress:
@@ -124,7 +124,7 @@ int RunLoop(EventCallback callback)
                     event.type = EVENT_MOUSE_MOVE;
                     event.mouseMove.x = xEvent.xmotion.x;
                     event.mouseMove.y = xEvent.xmotion.y;
-                    (eventCallback)((WindowHandle)window, event);
+                    (eventCallback)((PlatformWindowHandle)window, event);
                 } break;
 
                 case ConfigureNotify:
@@ -138,7 +138,7 @@ int RunLoop(EventCallback callback)
                     event.windowResize.width = window->width;
                     event.windowResize.height = window->height;
 
-                    (eventCallback)((WindowHandle)window, event);
+                    (eventCallback)((PlatformWindowHandle)window, event);
 
                 } break;
 
@@ -148,7 +148,7 @@ int RunLoop(EventCallback callback)
                     if (xEvent.xclient.data.l[0] == window->deleteMessage)
                     {
                         event.type = EVENT_WINDOW_CLOSE;
-                        (eventCallback)((WindowHandle)window, event);
+                        (eventCallback)((PlatformWindowHandle)window, event);
                     }
                 } break;
 

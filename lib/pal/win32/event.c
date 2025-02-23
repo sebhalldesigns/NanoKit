@@ -111,24 +111,24 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             event.windowResize.width = window->width;
             event.windowResize.height = window->height;
 
-            (eventCallback)((WindowHandle)window, event);
+            (eventCallback)((PlatformWindowHandle)window, event);
         } break;
 
         case WM_CLOSE:
         {
             event.type = EVENT_WINDOW_CLOSE;
-            (eventCallback)((WindowHandle)window, event);
+            (eventCallback)((PlatformWindowHandle)window, event);
         } break;
 
         case WM_PAINT:
         {
             
-            BeginRender((WindowHandle)window);
+            BeginPlatformRender((PlatformWindowHandle)window);
             
             event.type = EVENT_WINDOW_REDRAW;
-            (eventCallback)((WindowHandle)window, event);
+            (eventCallback)((PlatformWindowHandle)window, event);
             
-            EndRender((WindowHandle)window);
+            EndPlatformRender((PlatformWindowHandle)window);
 
         } break;
 
@@ -137,7 +137,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             event.type = EVENT_MOUSE_MOVE;
             event.mouseMove.x = LOWORD(lParam);
             event.mouseMove.y = HIWORD(lParam);
-            (eventCallback)((WindowHandle)window, event);
+            (eventCallback)((PlatformWindowHandle)window, event);
         }  break;
 
         default:

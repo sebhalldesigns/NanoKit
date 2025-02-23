@@ -102,7 +102,7 @@ static bool InitOpenGL();
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-WindowHandle InitWindow(const char *title, size_t width, size_t height)
+PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height)
 {
 
     if (!initialized)
@@ -200,10 +200,10 @@ WindowHandle InitWindow(const char *title, size_t width, size_t height)
     windows = (Win32Window **)realloc(windows, windowCount * sizeof(Win32Window));
     windows[windowCount - 1] = window;
 
-    return (WindowHandle)window;
+    return (PlatformWindowHandle)window;
 }
 
-void FreeWindow(WindowHandle window)
+void FreePlatformWindow(PlatformWindowHandle window)
 {
     if (!window)
     {
@@ -239,7 +239,7 @@ void FreeWindow(WindowHandle window)
 
 }
 
-void BeginRender(WindowHandle window)
+void BeginPlatformRender(PlatformWindowHandle window)
 {
     if (!window)
     {
@@ -264,7 +264,7 @@ void BeginRender(WindowHandle window)
 
 }
 
-void EndRender(WindowHandle window)
+void EndPlatformRender(PlatformWindowHandle window)
 {
     if (!window)
     {
@@ -277,7 +277,7 @@ void EndRender(WindowHandle window)
     EndPaint(win32Window->hwnd, &win32Window->ps);
 }
 
-NVGcontext *GetNanoVGContext(WindowHandle window)
+NVGcontext *GetNanoVGContext(PlatformWindowHandle window)
 {
     if (!window)
     {
@@ -288,7 +288,7 @@ NVGcontext *GetNanoVGContext(WindowHandle window)
     return win32Window->nvg;
 }
 
-Size GetWindowSize(WindowHandle window)
+Size GetWindowSize(PlatformWindowHandle window)
 {
     if (!window)
     {

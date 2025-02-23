@@ -6,10 +6,10 @@
 
 #include <extern/nanovg/src/nanovg.h>
 
-WindowHandle window1;
+PlatformWindowHandle window1;
 int segoe;
 
-void Callback(WindowHandle window, Event event)
+void Callback(PlatformWindowHandle window, Event event)
 {
     switch (event.type)
     {
@@ -24,7 +24,7 @@ void Callback(WindowHandle window, Event event)
 
             if (window == window1)
             {
-                BeginRender(window);
+                BeginPlatformRender(window);
 
                 NVGcontext *nvg = GetNanoVGContext(window);
                 if (nvg)
@@ -63,7 +63,7 @@ void Callback(WindowHandle window, Event event)
                     nvgEndFrame(nvg);
                 }
                 
-                EndRender(window);
+                EndPlatformRender(window);
             }
         } break;
 
@@ -117,16 +117,16 @@ int main()
 {   
     printf("FOUND %d processors\n", GetNumberOfProcessors());
 
-    window1 = InitWindow("Hello, World اَلْعَرَبِيَّةُ 汉语 😊😊!", 800, 600);
+    window1 = InitPlatformWindow("Hello, World اَلْعَرَبِيَّةُ 汉语 😊😊!", 800, 600);
     NVGcontext *nvg = GetNanoVGContext(window1);
 
     segoe = nvgCreateFont(nvg, "segoe", "C:/Windows/Fonts/segoeui.ttf");
 
 
 
-    WindowHandle window2 = InitWindow("Hello, World 2️⃣!", 800, 600);
+    PlatformWindowHandle window2 = InitPlatformWindow("Hello, World 2️⃣!", 800, 600);
 
-    //FreeWindow(window);
+    //FreePlatformWindow(window);
 
     return RunLoop(Callback);
 }

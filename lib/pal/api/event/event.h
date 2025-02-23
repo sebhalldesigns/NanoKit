@@ -79,7 +79,7 @@ typedef struct
     };
 } Event;    
 
-typedef void (*EventCallback)(WindowHandle window, Event event);
+typedef void (*EventCallback)(PlatformWindowHandle window, Event event);
 
 /***************************************************************
 ** MARK: FUNCTION DEFS

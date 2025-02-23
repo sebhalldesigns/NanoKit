@@ -61,6 +61,9 @@ add_library(NanoKit STATIC
     ${PLATFORM_SOURCE}
     #kit/threadpool/threadpool.c
     log/log.c
+    app/app.c
+    view/view.c
+    window/window.c
 )
 
 target_link_libraries(NanoKit 

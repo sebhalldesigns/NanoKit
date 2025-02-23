@@ -1,28 +1,24 @@
 /***************************************************************
 **
-** NanoKit Platform Abstraction Layer Header File
+** NanoKit Library Header File
 **
-** File         :  window.h
-** Module       :  window
+** File         :  geometry.h
+** Module       :  common
 ** Author       :  SH
-** Created      :  2025-02-13 (YYYY-MM-DD)
+** Created      :  2025-02-23 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Window API
+** Description  :  Shared Geometry Types
 **
 ***************************************************************/
 
-#ifndef PLATFORMWINDOW_H
-#define PLATFORMWINDOW_H
+#ifndef GEOMETRY_H
+#define GEOMETRY_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
-#include <extern/nanovg/src/nanovg.h>
-#include <common/geometry.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -32,21 +28,26 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef uintptr_t PlatformWindowHandle;
+typedef struct 
+{
+    float width;
+    float height;
+} Size;
 
+typedef struct 
+{
+    float x;
+    float y;
+} Point;
+
+typedef struct 
+{
+    Point origin;
+    Size size;
+} Rect;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height);
-void FreePlatformWindow(PlatformWindowHandle window);
-
-void BeginPlatformRender(PlatformWindowHandle window);
-void EndPlatformRender(PlatformWindowHandle window);
-
-NVGcontext *GetNanoVGContext(PlatformWindowHandle window);
-
-Size GetWindowSize(PlatformWindowHandle window);
-
-#endif /* PLATFORMWINDOW_H */
+#endif /* VIEW_H */

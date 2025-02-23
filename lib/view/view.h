@@ -1,28 +1,26 @@
 /***************************************************************
 **
-** NanoKit Platform Abstraction Layer Header File
+** NanoKit Library Header File
 **
-** File         :  window.h
-** Module       :  window
+** File         :  view.h
+** Module       :  view
 ** Author       :  SH
-** Created      :  2025-02-13 (YYYY-MM-DD)
+** Created      :  2025-02-23 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Window API
+** Description  :  NanoKit View API
 **
 ***************************************************************/
 
-#ifndef PLATFORMWINDOW_H
-#define PLATFORMWINDOW_H
+#ifndef VIEW_H
+#define VIEW_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdbool.h>
 #include <stdint.h>
-#include <stddef.h>
-#include <extern/nanovg/src/nanovg.h>
-#include <common/geometry.h>
+
+#include "../common/geometry.h"
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -32,21 +30,32 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef uintptr_t PlatformWindowHandle;
+typedef void (*ViewInitCallback)(void *view);
+typedef void (*ViewResizeCallback)(void *view, Size newSize);
+
+typedef struct ViewClass
+{
+    const char *name;
+    size_t dataSize;    
+    ViewResizeCallback resizeCallback;
+} ViewClass;
+
+typedef struct 
+{
+    ViewClass *viewClass;
+    Rect frame;
+    void *data;
+} View;
 
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height);
-void FreePlatformWindow(PlatformWindowHandle window);
+void RegisterViewClass(ViewClass *viewClass);
+ViewClass *GetViewClassByName(const char *name);
 
-void BeginPlatformRender(PlatformWindowHandle window);
-void EndPlatformRender(PlatformWindowHandle window);
+View *InitView(ViewClass *viewClass);
+void FreeView(View *view);
 
-NVGcontext *GetNanoVGContext(PlatformWindowHandle window);
-
-Size GetWindowSize(PlatformWindowHandle window);
-
-#endif /* PLATFORMWINDOW_H */
+#endif /* VIEW_H */
