@@ -22,7 +22,7 @@
 #include <stdint.h>
 #include <stddef.h>
 #include <extern/nanovg/src/nanovg.h>
-#include <common/geometry.h>
+#include <kit/common/geometry.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS

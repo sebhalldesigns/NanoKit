@@ -19,7 +19,7 @@
 #include <pal/win32/win32_window.h>
 #include <pal/win32/win32_event.h>
 
-#include <log/log.h>
+#include <kit/log/log.h>
 
 #include <stdio.h>
 
