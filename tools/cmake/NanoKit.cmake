@@ -30,7 +30,7 @@ function(generate_modules target)
         add_custom_command(
             OUTPUT ${gen_header} ${gen_src}  # These files are the output of the custom command
             COMMAND ${NKGEN} ${mod_base} ${xml_file} ${gen_header} ${gen_src}
-            COMMENT "Running NKGEN >>> ${mod_base}.xml.h and ${mod_base}.xml.c from ${xml_file}"
+            COMMENT "RUNNING NKGEN ${mod_base} ${xml_file} ${gen_header} ${gen_src}"
             DEPENDS ${xml_file}             # nkgen depends on the .xml file
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             VERBATIM
@@ -66,8 +66,6 @@ function(generate_html)
 
         # Replace a placeholder string with the project or target name
         string(REPLACE "@TARGET_NAME@" "${CMAKE_PROJECT_NAME}" FILE_CONTENTS "${FILE_CONTENTS}")
-
-        message("OUTPUT_NAME: ${CMAKE_PROJECT_NAME}")
 
         # Write the modified content to a new file
         file(WRITE ${OUTPUT_FILE} "${FILE_CONTENTS}")

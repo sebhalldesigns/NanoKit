@@ -54,7 +54,7 @@ FileContents ParseFile(char* contents, size_t size, const char* moduleName)
 
     FileContents fileContents = {0};
 
-    return ;
+    return;
 }
 
 /***************************************************************
