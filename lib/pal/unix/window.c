@@ -89,7 +89,7 @@ static GLXContext currentGlrc = NULL;
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height)
+PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height, void *data)
 {
 
     if (!initialized)
@@ -190,6 +190,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     window->width = width;
     window->height = height;
     window->nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+    window->data = data;
 
     windowCount++;
     windows = (X11Window **)realloc(windows, windowCount * sizeof(X11Window));
@@ -233,6 +234,17 @@ void FreePlatformWindow(PlatformWindowHandle window)
     windowCount--;
     windows = (X11Window **)realloc(windows, windowCount * sizeof(X11Window));
 
+}
+
+void *GetPlatformWindowData(PlatformWindowHandle window)
+{
+    if (!window)
+    {
+        return NULL;
+    }
+
+    X11Window *x11Window = (X11Window *)window;
+    return x11Window->data;
 }
 
 void BeginPlatformRender(PlatformWindowHandle window)

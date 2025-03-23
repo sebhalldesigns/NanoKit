@@ -102,7 +102,7 @@ static bool InitOpenGL();
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height)
+PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height, void *data)
 {
 
     if (!initialized)
@@ -195,6 +195,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     window->hdc = gldc;
     window->hglrc = glrc;
     window->nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+    window->data = data;
 
     windowCount++;
     windows = (Win32Window **)realloc(windows, windowCount * sizeof(Win32Window));
@@ -237,6 +238,17 @@ void FreePlatformWindow(PlatformWindowHandle window)
     windowCount--;
     windows = (Win32Window **)realloc(windows, windowCount * sizeof(Win32Window));
 
+}
+
+void *GetPlatformWindowData(PlatformWindowHandle window)
+{
+    if (!window)
+    {
+        return NULL;
+    }
+
+    Win32Window *win32Window = (Win32Window *)window;
+    return win32Window->data;
 }
 
 void BeginPlatformRender(PlatformWindowHandle window)

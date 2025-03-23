@@ -19,6 +19,8 @@
 #include "../log/log.h"
 
 #include "../pal/api/event/event.h"
+#include "../window/window.h"
+#include "../view/view.h"
 
 #include <stdio.h>
 #include <stdlib.h>
@@ -72,7 +74,39 @@ int RunApp(App *app)
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
 
-void WindowEventCallback(PlatformWindowHandle window, Event event)
+void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
 {
+    if (platformWindow == 0)
+    {
+        return;
+    }
 
+    Window* window = GetPlatformWindowData(platformWindow);
+
+    switch (event.type)
+    {
+        case EVENT_WINDOW_RESIZE:
+        {
+            if (window->windowClass)
+            {
+                (window->windowClass->resizeCallback)(window, (Size){event.windowResize.width, event.windowResize.height});
+            }
+
+        } break;
+
+        case EVENT_WINDOW_REDRAW:
+        {
+            if (window->rootView)
+            {
+                RenderView(window->rootView);
+            }
+
+        } break;
+
+        default:
+        {
+            /* unhandled event */
+        } break;
+            
+    }
 }

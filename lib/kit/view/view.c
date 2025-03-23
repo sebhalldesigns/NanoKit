@@ -18,8 +18,11 @@
 #include "view.h"
 #include "../log/log.h"
 
+#include <extern/glad/glad.h>
+
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -63,18 +66,61 @@ void RegisterViewClass(ViewClass *viewClass)
 
 ViewClass *GetViewClassByName(const char *name)
 {
+    for (size_t i = 0; i < viewClassCount; i++)
+    {
+        if (strcmp(viewClasses[i].name, name) == 0)
+        {
+            return &viewClasses[i];
+        }
+    }
+
+    LogWarn("View Class not found: %s", name);
+
     return NULL;
 }
 
-View *InitView(ViewClass *viewClass)
+View *CreateView(ViewClass *viewClass)
 {
-    return NULL;
+
+    View *view = (View *)malloc(sizeof(View));
+    view->class = viewClass;
+    view->frame = (Rect){0, 0, 0, 0};
+    view->data = NULL;
+    view->parent = NULL;
+    view->subviews = NULL;
+    view->subviewCount = 0;
+    view->layoutType = LAYOUT_TYPE_NONE;
+
+    view->textureAttachment = 0;
+
+    return view;
 
 }
 
-void FreeView(View *view)
+void DestroyView(View *view)
 {
+    return;
+}
 
+void RenderView(View *view)
+{
+    if (view->textureAttachment == 0)
+    {
+
+        /* create texture attachment */
+        printf("Creating texture attachment\n");
+
+        /*
+        glGenTextures(1, &view->textureAttachment);
+
+        glBindTexture(GL_TEXTURE_2D, view->textureAttachment);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, view->frame.size.width, view->frame.size.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glBindTexture(GL_TEXTURE_2D, 0);
+        */
+    }
+    
 }
 
 /***************************************************************

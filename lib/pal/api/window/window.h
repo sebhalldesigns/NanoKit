@@ -39,8 +39,10 @@ typedef uintptr_t PlatformWindowHandle;
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height);
+PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height, void *data);
 void FreePlatformWindow(PlatformWindowHandle window);
+
+void *GetPlatformWindowData(PlatformWindowHandle window);
 
 void BeginPlatformRender(PlatformWindowHandle window);
 void EndPlatformRender(PlatformWindowHandle window);

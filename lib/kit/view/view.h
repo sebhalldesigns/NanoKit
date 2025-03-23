@@ -19,6 +19,7 @@
 ***************************************************************/
 
 #include <stdint.h>
+#include <stdbool.h>
 
 #include "../common/geometry.h"
 
@@ -30,8 +31,8 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef void (*ViewInitCallback)(void *view);
-typedef void (*ViewResizeCallback)(void *view, Size newSize);
+typedef void (*ViewLayoutCallback)(void *view); /* possibly have layoutdown and layoutup like WPF? */
+typedef void (*ViewDrawCallback)(void *view);
 
 typedef enum 
 {
@@ -44,27 +45,46 @@ typedef enum
 typedef struct ViewClass
 {
     const char *name;
+    struct ViewClass * super;   /* optional superclass to inherit from */
+
+    /* Callbacks */
+    ViewLayoutCallback layoutCallback;
+    ViewDrawCallback drawCallback;      /* set to NULL for no drawing */ 
+
     size_t dataSize;    
-    ViewResizeCallback resizeCallback;
+
 } ViewClass;
 
 typedef struct View
 {
-    ViewClass *viewClass;
+
+    ViewClass *class;
+    
     Rect frame;
+    
     void *data;
 
     struct View *parent;
     struct View *subviews;
     size_t subviewCount;
 
+    uintptr_t textureAttachment;
+
     ViewLayoutType layoutType;
-    
 } View;
 
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
+
+void RegisterViewClass(ViewClass *viewClass);
+ViewClass *GetViewClassByName(const char *name);
+
+View *CreateView(ViewClass *viewClass);
+void DestroyView(View *view);
+
+/* called by system when view should be rendered */
+void RenderView(View *view);
 
 #endif /* VIEW_H */

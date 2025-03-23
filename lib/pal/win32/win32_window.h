@@ -51,6 +51,8 @@ typedef struct Win32Window
     const char *title;
     size_t width;
     size_t height;
+
+    void *data;
 } Win32Window;
 
 /***************************************************************

@@ -21,8 +21,16 @@
 #include <stdint.h>
 
 #include "../common/geometry.h"
+
 #include "../view/view.h"
 #include "../pal/api/window/window.h"
+
+#ifdef _WIN32
+
+    /* Redefine symbols to prevent user32 linker confict */
+    #define CreateWindow NanoKit_CreateWindow
+    #define DestroyWindow NanoKit_DestroyWindow
+#endif
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -44,11 +52,17 @@ typedef struct WindowClass
 
 typedef struct 
 {
+    
     WindowClass *windowClass;
+
+    const char *title;
     Size size;
-    void *data;
+
     View *rootView;
+    
     PlatformWindowHandle platformHandle;
+
+    /*void *data;*/
 } Window;
 
 /***************************************************************
@@ -58,7 +72,7 @@ typedef struct
 void RegisterWindowClass(WindowClass *windowClass);
 WindowClass *GetWindowClassByName(const char *name);
 
-Window *InitWindow(WindowClass *windowClass, const char *title, size_t width, size_t height);
-void FreeWindow(Window *window);
+Window *CreateWindow(WindowClass *windowClass, const char *title, size_t width, size_t height);
+void DestroyWindow(Window *window);
 
 #endif /* WINDOW_H */

@@ -20,6 +20,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -63,17 +64,38 @@ void RegisterWindowClass(WindowClass *windowClass)
 
 WindowClass *GetWindowClassByName(const char *name)
 {
+    for (size_t i = 0; i < windowClassCount; i++)
+    {
+        if (strcmp(windowClasses[i].name, name) == 0)
+        {
+            return &windowClasses[i];
+        }
+    }
+
+    LogWarn("View Class not found: %s", name);
+
     return NULL;
 }
 
-Window *InitWindow(WindowClass *windowClass, const char *title, size_t width, size_t height)
+Window *CreateWindow(WindowClass *windowClass, const char *title, size_t width, size_t height)
 {
 
+    Window *window = (Window *)malloc(sizeof(Window));
     
-    return NULL;
+    window->windowClass = windowClass;
+
+    window->title = title;
+    window->size.width = width;
+    window->size.height = height;
+
+    window->rootView = NULL;
+
+    window->platformHandle = InitPlatformWindow(title, width, height, window);
+
+    return window;
 }
 
-void FreeWindow(Window *window)
+void DestroyWindow(Window *window)
 {
 
 }

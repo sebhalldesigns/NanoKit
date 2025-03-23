@@ -28,7 +28,7 @@ add_library(NanoKit STATIC
     window/window.c
 )
 
-target_link_libraries(NanoKit 
+target_link_libraries(NanoKit PRIVATE
    NanoKit-PAL
 )
 
