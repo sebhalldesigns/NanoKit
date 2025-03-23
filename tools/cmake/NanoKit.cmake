@@ -30,7 +30,7 @@ function(generate_modules target)
         add_custom_command(
             OUTPUT ${gen_header} ${gen_src}  # These files are the output of the custom command
             COMMAND ${NKGEN} ${mod_base} ${xml_file} ${gen_header} ${gen_src}
-            COMMENT "Generating ${mod_base}.xml.h and ${mod_base}.xml.c from ${xml_file}"
+            COMMENT "Running NKGEN >>> ${mod_base}.xml.h and ${mod_base}.xml.c from ${xml_file}"
             DEPENDS ${xml_file}             # nkgen depends on the .xml file
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             VERBATIM

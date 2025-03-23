@@ -8,5 +8,5 @@ add_executable(nkgen
 )
 
 target_include_directories(nkgen PRIVATE
-   src/xml
+   src
 )

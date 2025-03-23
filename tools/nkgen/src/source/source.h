@@ -1,25 +1,26 @@
 /***************************************************************
 **
-** NanoKit Library Header File
+** NanoKit Tool Header File
 **
-** File         :  NanoKit.h
-** Module       :  root
+** File         :  source.h
+** Module       :  nkgen
 ** Author       :  SH
-** Created      :  2025-02-09 (YYYY-MM-DD)
+** Created      :  2025-03-23 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  A lightweight, cross-platform application
-**                 framework.
+** Description  :  nkgen source file writer
 **
 ***************************************************************/
 
-#ifndef NANOKIT_H
-#define NANOKIT_H
+#ifndef SOURCE_H
+#define SOURCE_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include "window/window.h"  
+#include <stdint.h>
+
+#include <parser/parser.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -33,4 +34,6 @@
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-#endif /* NANOKIT_H */
+void WriteSourceFile(const char* path, const char* moduleName, FileContents* fileContents);
+
+#endif /* SOURCE_H */
