@@ -18,7 +18,7 @@
 #include <pal/api/window/window.h>
 #include <pal/unix/x11_window.h>
 
-#include <log/log.h>
+#include <kit/log/log.h>
 
 #include <stdlib.h>
 #include <stdio.h>
@@ -54,7 +54,7 @@ static int visual_attribs[] = {
     None
 };
 
-extern const char resources_shaders_shader_frag[];
+//extern const char resources_shaders_shader_frag[];
 
 
 
@@ -95,7 +95,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     if (!initialized)
     {
 
-        printf("loaded shader frag: %s\n", resources_shaders_shader_frag);
+        //printf("loaded shader frag: %s\n", resources_shaders_shader_frag);
         display = XOpenDisplay(NULL);
         if (!display)
         {

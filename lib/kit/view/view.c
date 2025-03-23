@@ -39,6 +39,10 @@
 static ViewClass *viewClasses = NULL;
 static size_t viewClassCount = 0;
 
+extern ViewClass *libraryViewClasses;
+extern size_t libraryViewClassesCount;
+
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
@@ -74,6 +78,14 @@ ViewClass *GetViewClassByName(const char *name)
         }
     }
 
+    for (size_t i = 0; i < libraryViewClassesCount; i++)
+    {
+        if (strcmp(libraryViewClasses[i].name, name) == 0)
+        {
+            return &libraryViewClasses[i];
+        }
+    }
+
     LogWarn("View Class not found: %s", name);
 
     return NULL;
@@ -89,7 +101,6 @@ View *CreateView(ViewClass *viewClass)
     view->parent = NULL;
     view->subviews = NULL;
     view->subviewCount = 0;
-    view->layoutType = LAYOUT_TYPE_NONE;
 
     view->textureAttachment = 0;
 
@@ -100,6 +111,19 @@ View *CreateView(ViewClass *viewClass)
 void DestroyView(View *view)
 {
     return;
+}
+
+void LayoutView(View *view)
+{
+    if (view->class && view->class->layoutCallback)
+    {
+        (view->class->layoutCallback)(view);
+    }
+
+    for (size_t i = 0; i < view->subviewCount; i++)
+    {
+        LayoutView(&view->subviews[i]);
+    }
 }
 
 void RenderView(View *view)

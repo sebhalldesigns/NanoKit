@@ -87,9 +87,20 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
     {
         case EVENT_WINDOW_RESIZE:
         {
+
+            printf("Window resized to %dx%d\n", event.windowResize.width, event.windowResize.height);
             if (window->windowClass)
             {
                 (window->windowClass->resizeCallback)(window, (Size){event.windowResize.width, event.windowResize.height});
+            }
+
+            /* resize the root view */
+            if (window->rootView)
+            {
+                window->rootView->frame.size.width = event.windowResize.width;
+                window->rootView->frame.size.height = event.windowResize.height;
+
+                LayoutView(window->rootView);
             }
 
         } break;

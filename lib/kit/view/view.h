@@ -20,6 +20,7 @@
 
 #include <stdint.h>
 #include <stdbool.h>
+#include <stddef.h>
 
 #include "../common/geometry.h"
 
@@ -42,6 +43,15 @@ typedef enum
     LAYOUT_TYPE_HSTACK
 } ViewLayoutType;
 
+
+typedef enum
+{
+    DOCK_POSITION_TOP,
+    DOCK_POSITION_BOTTOM,
+    DOCK_POSITION_LEFT,
+    DOCK_POSITION_RIGHT
+} DockPosition;
+
 typedef struct ViewClass
 {
     const char *name;
@@ -51,26 +61,28 @@ typedef struct ViewClass
     ViewLayoutCallback layoutCallback;
     ViewDrawCallback drawCallback;      /* set to NULL for no drawing */ 
 
-    size_t dataSize;    
+    size_t dataSize;
 
 } ViewClass;
 
 typedef struct View
 {
-
-    ViewClass *class;
+    ViewClass *class; /* can be NULL */
     
     Rect frame;
+
+    Size sizeRequest;
     
     void *data;
 
-    struct View *parent;
-    struct View *subviews;
+    struct View *parent; /* can be NULL*/
+    
     size_t subviewCount;
+    struct View *subviews; /* can be NULL*/
+
+    DockPosition dockPosition;
 
     uintptr_t textureAttachment;
-
-    ViewLayoutType layoutType;
 } View;
 
 
@@ -83,6 +95,9 @@ ViewClass *GetViewClassByName(const char *name);
 
 View *CreateView(ViewClass *viewClass);
 void DestroyView(View *view);
+
+/* called by system on window resize */
+void LayoutView(View *view);
 
 /* called by system when view should be rendered */
 void RenderView(View *view);

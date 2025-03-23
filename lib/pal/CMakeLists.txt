@@ -23,17 +23,21 @@ elseif(EMSCRIPTEN)
     
     message("    - DETECTED WASM")
 
+    set(PLATFORM_SOURCE
+        wasm/thread.c
+        wasm/window.c
+        wasm/event.c
+    )
+
+
 elseif(UNIX)
 
     message("    - DETECTED UNIX")
 
     set(PLATFORM_SOURCE
-        pal/unix/thread.c
-        pal/unix/window.c
-        pal/unix/event.c
-
-        extern/glad/glad.c
-        extern/nanovg/src/nanovg.c
+        unix/thread.c
+        unix/window.c
+        unix/event.c
     )
 
     set(PLATFORM_DEPENDENCIES

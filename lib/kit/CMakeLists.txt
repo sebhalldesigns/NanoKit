@@ -25,6 +25,7 @@ add_library(NanoKit STATIC
     log/log.c
     app/app.c
     view/view.c
+    view/view_library.c
     window/window.c
 )
 

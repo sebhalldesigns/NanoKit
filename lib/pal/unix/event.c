@@ -19,7 +19,7 @@
 #include <pal/api/event/event.h>
 
 #include <pal/unix/x11_window.h>
-#include <log/log.h>
+#include <kit/log/log.h>
 
 #include <stdio.h>
 
@@ -120,7 +120,7 @@ int RunLoop(EventCallback callback)
                         XNextEvent(display, &xEvent);
                     }
 
-                    printf("Mouse moved to (%d, %d)\n", xEvent.xmotion.x, xEvent.xmotion.y);
+                    //printf("Mouse moved to (%d, %d)\n", xEvent.xmotion.x, xEvent.xmotion.y);
                     event.type = EVENT_MOUSE_MOVE;
                     event.mouseMove.x = xEvent.xmotion.x;
                     event.mouseMove.y = xEvent.xmotion.y;
@@ -129,7 +129,14 @@ int RunLoop(EventCallback callback)
 
                 case ConfigureNotify:
                 {
-                    printf("Window resized to %dx%d\n", xEvent.xconfigure.width, xEvent.xconfigure.height);
+
+                    /* ignore repeat size requests */
+                    if (window->width == xEvent.xconfigure.width && window->height == xEvent.xconfigure.height)
+                    {
+                        break;
+                    }
+
+                    //printf("Window resized to %dx%d\n", xEvent.xconfigure.width, xEvent.xconfigure.height);
                     event.type = EVENT_WINDOW_RESIZE;
 
                     window->width = xEvent.xconfigure.width;
