@@ -107,6 +107,9 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
 
         case EVENT_WINDOW_REDRAW:
         {
+            
+            window->windowClass->renderCallback(window);
+            
             if (window->rootView)
             {
                 RenderView(window->rootView);

@@ -45,6 +45,7 @@ embed_resources(NanoKit
     resources/fonts/literata.ttf
     resources/fonts/mrdafoe.ttf
     resources/shaders/shader.frag
+    resources/shaders/shader.vert
 )
 
 message("<<< DONE")

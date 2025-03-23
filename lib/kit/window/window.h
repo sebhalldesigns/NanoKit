@@ -42,12 +42,14 @@
 
 typedef void (*WindowInitCallback)(void *view);
 typedef void (*WindowResizeCallback)(void *view, Size newSize);
+typedef void (*WindowRenderCallback)(void *window);
 
 typedef struct WindowClass
 {
     const char *name;
     size_t dataSize;    
     WindowResizeCallback resizeCallback;
+    WindowRenderCallback renderCallback;
 } WindowClass;
 
 typedef struct 

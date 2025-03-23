@@ -45,6 +45,7 @@ typedef struct
 /* create a GPU context with default shaders */
 /* on a per-window basis */
 GpuContext *CreateGpuContext();
+
 void DestroyGpuContext(GpuContext *context);
 
 void SetContextCurrent(GpuContext *context);

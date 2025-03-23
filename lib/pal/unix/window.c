@@ -263,7 +263,7 @@ void BeginPlatformRender(PlatformWindowHandle window)
     }
     
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 1.0f, 0.0f, 1.0f);
+    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glViewport(0, 0, x11Window->width, x11Window->height);
 
