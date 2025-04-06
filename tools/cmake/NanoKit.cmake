@@ -1,5 +1,7 @@
 # NanoKit/tools/cmake/NanoKit.cmake
 
+cmake_minimum_required(VERSION 3.17)
+
 function(generate_modules target)
 
     # Get the list of modules passed to the function
@@ -11,6 +13,8 @@ function(generate_modules target)
     
     # Get the path to the nkgen executable
     set(NKGEN "$<TARGET_FILE:nkgen>")
+
+    set(NANOKIT_DIR "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../lib")
 
     foreach(mod ${modules})
         # Get the base name: if mod is "src/Window", then mod_base becomes "Window"
@@ -44,7 +48,8 @@ function(generate_modules target)
         )
 
         target_compile_definitions(${mod_base} PUBLIC "${mod_base_upper}_BUILD")
-        target_include_directories(${mod_base} PUBLIC ${GEN_DIR})
+        target_include_directories(${mod_base} PUBLIC ${GEN_DIR} ${NANOKIT_DIR}/kit ${NANOKIT_DIR})
+        message("include directory: ${NANOKIT_DIR}")
         target_link_libraries(${target} ${mod_base})
         
     endforeach()

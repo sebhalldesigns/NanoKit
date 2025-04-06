@@ -46,15 +46,15 @@ static char moduleNameUpper[256];
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
 
-//static void ProcessWindow(Window* window);
-//static void ProcessRootView(RootView* rootView);
+static void ProcessWindow(Window* window);
+static void ProcessRootView(RootView* rootView);
 //static void ProcessView(View* view);
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-void WriteSourceFile(const char* path, const char* moduleName)
+void WriteSourceFile(const char* path, const char* moduleName, FileContents* fileContents)
 {
     if (outputBuffer != NULL) 
     {
@@ -91,25 +91,18 @@ void WriteSourceFile(const char* path, const char* moduleName)
         );
 
     positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
-        "#include <stdio.h>\n\
+        "#include \"%.*s.xml.h\"\n\
+#include <stdio.h>\n\
 \n");
 
-    positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
-        "void %s_Init(void)\n\
-{\n\
-    printf(\"%s_Init\\n\");\n\
-}\n\
-\n\
-void %s_Destroy(void)\n\
-{\n\
-    printf(\"%s_Destroy\\n\");\n\
-}\n\
-\n",
-        moduleNameUpper,
-        moduleNameUpper,
-        moduleNameUpper,
-        moduleNameUpper
-    );
+    if (fileContents->rootNodeType == ROOT_NODE_WINDOW)
+    {
+        ProcessWindow((Window*)fileContents->rootNode);
+    }
+    else
+    {
+        ProcessRootView((RootView*)fileContents->rootNode);
+    }
 
     FILE *sourceFile = fopen(path, "w");
     
@@ -129,3 +122,43 @@ void %s_Destroy(void)\n\
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
 
+static void ProcessWindow(Window* window)
+{
+    /* init function */
+
+    positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
+        "nkWindow* %s_Create(void)\n\
+{\n\
+    printf(\"%s_Create\\n\");\n\
+    nkWindow* window = CreateWindow(\"%s\", %d, %d);\n\
+    return window;\n\
+}\n\
+\n",
+        moduleNameBuffer,   
+        moduleNameBuffer,
+        window->Title,
+        window->Width,
+        window->Height
+    );
+
+
+    /* destroy function */
+
+    positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
+        "void %s_Destroy(nkWindow* window)\n\
+{\n\
+    printf(\"%s_Destroy\\n\");\n\
+    DestroyWindow(window);\n\
+}\n\
+\n",
+        moduleNameBuffer,
+        moduleNameBuffer
+    );
+
+
+}
+
+static void ProcessRootView(RootView* rootView)
+{
+    
+}

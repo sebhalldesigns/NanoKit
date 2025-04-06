@@ -45,7 +45,7 @@ void org_nanokit_dock_layout(void *view);
 ** MARK: GLOBAL VARIABLES
 ***************************************************************/
 
-ViewClass org_nanokit_dock = (ViewClass) {
+ViewClass org_nanokit_dock = {
     .name = "org.nanokit.dock",
     .dataSize = 0,
     .drawCallback = org_nanokit_dock_draw,

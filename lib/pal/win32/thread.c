@@ -18,8 +18,10 @@
 
 #include <pal/api/thread/thread.h>
 
-#include <process.h>
-#include <sysinfoapi.h>
+//#include <windowsx.h>
+//#include <sysinfoapi.h>
+//#include <process.h>
+
 
 #include <stdio.h>
 
@@ -45,14 +47,14 @@
 
 size_t GetNumberOfProcessors()
 {
-    SYSTEM_INFO sysinfo;
-    GetSystemInfo(&sysinfo);
-    return (size_t)(sysinfo.dwNumberOfProcessors);
+    //SYSTEM_INFO sysinfo;
+    //GetSystemInfo(&sysinfo);
+    return 0;//(size_t)(sysinfo.dwNumberOfProcessors);
 }
 
 ThreadHandle CreateThread(ThreadFunction function, void *arg)
 {
-    return (ThreadHandle)_beginthreadex(NULL, 0, (_beginthreadex_proc_type)function, (LPVOID)arg, 0, NULL);
+    return NULL;//(ThreadHandle)_beginthreadex(NULL, 0, (_beginthreadex_proc_type)function, (LPVOID)arg, 0, NULL);
 }
 
 /***************************************************************

@@ -1,9 +1,13 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.17)
 
 project(NanoKit)
 
+if(MSVC)
+    set(CMAKE_GENERATOR_PLATFORM x64)  # or x86, ARM, etc.
+endif()
+
 add_subdirectory(tools)
-#add_subdirectory(lib)
+add_subdirectory(lib)
 
 
 

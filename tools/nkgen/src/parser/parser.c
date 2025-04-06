@@ -31,6 +31,11 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
+struct xml_string {
+	uint8_t const* buffer;
+	size_t length;
+};
+
 /***************************************************************
 ** MARK: STATIC VARIABLES
 ***************************************************************/
@@ -130,14 +135,26 @@ static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentTy
                 const char* attributeName = calloc(xml_string_length(attributeNameObject) + 1, 1);
                 xml_string_copy(attributeNameObject, attributeName, xml_string_length(attributeNameObject));
         
-                const char* attributeContent = calloc(xml_string_length(attributeContentObject) + 1, 1);
-                xml_string_copy(attributeContentObject, attributeContent, xml_string_length(attributeContentObject));
+                /* code to handle items with spaces in between */
+                const char* attributeContentObjectString = attributeContentObject->buffer;
+                
+                size_t attributeContentLength = 0;
+
+                while (attributeContentObjectString[attributeContentLength] != '\0' && attributeContentObjectString[attributeContentLength] != '\"')
+                {
+                    attributeContentLength++;
+                }
+
+                const char* attributeContent = calloc(attributeContentLength + 1, 1);
+                sprintf(attributeContent, "%.*s", (int)attributeContentLength, attributeContentObjectString);
         
                 printf("Attribute: %s = %s\n", attributeName, attributeContent);
         
                 if (strcmp("Title", attributeName) == 0)
                 {
-                    window->Title = attributeContent;
+                    window->Title = calloc(attributeContentLength + 1, 1);
+                    sprintf(window->Title, "%.*s", (int)attributeContentLength, attributeContentObjectString);
+
                 }
                 else if (strcmp("Width", attributeName) == 0)
                 {

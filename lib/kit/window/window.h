@@ -44,37 +44,29 @@ typedef void (*WindowInitCallback)(void *view);
 typedef void (*WindowResizeCallback)(void *view, Size newSize);
 typedef void (*WindowRenderCallback)(void *window);
 
-typedef struct WindowClass
-{
-    const char *name;
-    size_t dataSize;    
-    WindowResizeCallback resizeCallback;
-    WindowRenderCallback renderCallback;
-} WindowClass;
-
 typedef struct 
 {
-    
-    WindowClass *windowClass;
+    const char *Title;
+    Size Size;
 
-    const char *title;
-    Size size;
+    View *Content;
 
-    View *rootView;
-    
-    PlatformWindowHandle platformHandle;
 
-    /*void *data;*/
-} Window;
+    WindowResizeCallback ResizeCallback;
+    WindowRenderCallback RenderCallback;
+
+    PlatformWindowHandle PlatformHandle;
+
+    size_t DataSize;
+    void *DataHandle;
+} nkWindow;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-void RegisterWindowClass(WindowClass *windowClass);
-WindowClass *GetWindowClassByName(const char *name);
-
-Window *CreateWindow(WindowClass *windowClass, const char *title, size_t width, size_t height);
-void DestroyWindow(Window *window);
+nkWindow *CreateWindow(const char *title, int width, int height);
+void UpdateWindow(); /* push changes */
+void DestroyWindow(nkWindow *window);
 
 #endif /* WINDOW_H */

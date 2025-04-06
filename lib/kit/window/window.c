@@ -34,9 +34,6 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
-static WindowClass *windowClasses = NULL;
-static size_t windowClassCount = 0;
-
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
@@ -45,57 +42,32 @@ static size_t windowClassCount = 0;
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-void RegisterWindowClass(WindowClass *windowClass)
-{
-    if (windowClasses == NULL)
-    {
-        windowClasses = (WindowClass *)malloc(sizeof(WindowClass));
-    }
-    else
-    {
-        windowClasses = (WindowClass *)realloc(windowClasses, sizeof(WindowClass) * (windowClassCount + 1));
-    }
-
-    windowClasses[windowClassCount] = *windowClass;
-    windowClassCount++;
-
-    LogInfo("Registered Window Class: %s", windowClass->name);
-}
-
-WindowClass *GetWindowClassByName(const char *name)
-{
-    for (size_t i = 0; i < windowClassCount; i++)
-    {
-        if (strcmp(windowClasses[i].name, name) == 0)
-        {
-            return &windowClasses[i];
-        }
-    }
-
-    LogWarn("View Class not found: %s", name);
-
-    return NULL;
-}
-
-Window *CreateWindow(WindowClass *windowClass, const char *title, size_t width, size_t height)
+nkWindow *CreateWindow(const char* title, int width, int height)
 {
 
-    Window *window = (Window *)malloc(sizeof(Window));
-    
-    window->windowClass = windowClass;
+    nkWindow *window = (nkWindow *)malloc(sizeof(nkWindow));
+    if (window == NULL)
+    {
+        LogError("Failed to allocate Window");
+        return NULL;
+    }
 
-    window->title = title;
-    window->size.width = width;
-    window->size.height = height;
 
-    window->rootView = NULL;
 
-    window->platformHandle = InitPlatformWindow(title, width, height, window);
+    window->Title = title;
+    window->Size.width = width;
+    window->Size.height = height;
+
+    window->Content = NULL;
+    window->ResizeCallback = NULL;
+    window->RenderCallback = NULL;
+
+    window->PlatformHandle = InitPlatformWindow(title, width, height, window);
 
     return window;
 }
 
-void DestroyWindow(Window *window)
+void DestroyWindow(nkWindow *window)
 {
 
 }

@@ -81,7 +81,7 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
         return;
     }
 
-    Window* window = GetPlatformWindowData(platformWindow);
+    nkWindow* window = GetPlatformWindowData(platformWindow);
 
     switch (event.type)
     {
@@ -89,18 +89,18 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
         {
 
             printf("Window resized to %dx%d\n", event.windowResize.width, event.windowResize.height);
-            if (window->windowClass)
+            if (window->ResizeCallback)
             {
-                (window->windowClass->resizeCallback)(window, (Size){event.windowResize.width, event.windowResize.height});
+                (window->ResizeCallback)(window, (Size){event.windowResize.width, event.windowResize.height});
             }
 
             /* resize the root view */
-            if (window->rootView)
+            if (window->Content)
             {
-                window->rootView->frame.size.width = event.windowResize.width;
-                window->rootView->frame.size.height = event.windowResize.height;
+                window->Content->frame.size.width = event.windowResize.width;
+                window->Content->frame.size.height = event.windowResize.height;
 
-                LayoutView(window->rootView);
+                LayoutView(window->Content);
             }
 
         } break;
@@ -108,11 +108,16 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
         case EVENT_WINDOW_REDRAW:
         {
             
-            window->windowClass->renderCallback(window);
-            
-            if (window->rootView)
+            window->RenderCallback;
+
+            if (window->RenderCallback)
             {
-                RenderView(window->rootView);
+                (window->RenderCallback)(window);
+            }
+            
+            if (window->Content)
+            {
+                RenderView(window->Content);
             }
 
         } break;

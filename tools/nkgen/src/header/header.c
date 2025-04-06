@@ -76,6 +76,17 @@ void WriteHeaderFile(const char* path, const char* moduleName, FileContents* fil
     }
     moduleNameUpper[strlen(moduleName)] = '\0';
 
+    const char* moduleType;
+
+    if (fileContents->rootNodeType == ROOT_NODE_WINDOW)
+    {
+        moduleType = "nkWindow";
+    }
+    else
+    {
+        moduleType = "nkView";
+    }
+
     positionInFile = snprintf(outputBuffer, outputBufferSize, 
 "/***************************************************************\n\
 **\n\
@@ -89,9 +100,11 @@ void WriteHeaderFile(const char* path, const char* moduleName, FileContents* fil
 #ifndef %s_XML_H\n\
 #define %s_XML_H\n\
 \n\
+#include <NanoKit.h>\n\
+\n\
 /* Module Functions - Implementations Generated from XML */\n\
-void %s_Init(void);\n\
-void %s_Destroy(void);\n\
+%s* %s_Create(void);\n\
+void %s_Destroy(%s*);\n\
 \n\
 /* Callback Functions - Implemented in User Code */\n\
 ",
@@ -99,8 +112,10 @@ void %s_Destroy(void);\n\
         moduleName,
         moduleNameUpper,
         moduleNameUpper,
-        moduleNameUpper,
-        moduleNameUpper
+        moduleType,
+        moduleName,
+        moduleName,
+        moduleType
         );
 
 
