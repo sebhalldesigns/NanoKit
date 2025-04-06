@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.10)
 project(NanoKit)
 
 add_subdirectory(tools)
-add_subdirectory(lib)
+#add_subdirectory(lib)
 
 
 

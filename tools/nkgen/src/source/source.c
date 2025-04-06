@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <xml.h>
+#include <xml/xml.h>
 
 #include "source.h"
 
@@ -35,9 +35,20 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
+static char* outputBuffer = NULL;
+static size_t outputBufferSize = 0;
+static size_t positionInFile = 0;
+
+static char moduleNameBuffer[256];
+static char moduleNameUpper[256];
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
+
+//static void ProcessWindow(Window* window);
+//static void ProcessRootView(RootView* rootView);
+//static void ProcessView(View* view);
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
@@ -45,13 +56,26 @@
 
 void WriteSourceFile(const char* path, const char* moduleName)
 {
-    char moduleNameUpper[256];
+    if (outputBuffer != NULL) 
+    {
+        free(outputBuffer);
+    }
+
+    outputBufferSize = 1024 * 1024; // 1 MB
+    outputBuffer = (char*)malloc(outputBufferSize);
+    if (outputBuffer == NULL) {
+        fprintf(stderr, "Error: Could not allocate memory for output buffer\n");
+        exit(1);
+    }
+
+    sprintf(moduleNameBuffer, "%s", moduleName);
+    
     for (size_t i = 0; moduleName[i] != '\0'; i++) {
         moduleNameUpper[i] = (moduleName[i] >= 'a' && moduleName[i] <= 'z') ? moduleName[i] - 32 : moduleName[i];
     }
     moduleNameUpper[strlen(moduleName)] = '\0';
 
-    int positionInFile = snprintf(outputBuffer, outputBufferSize, 
+    positionInFile = snprintf(outputBuffer, outputBufferSize, 
 "/***************************************************************\n\
 **\n\
 ** NanoKit Generated Source File\n\
@@ -87,7 +111,6 @@ void %s_Destroy(void)\n\
         moduleNameUpper
     );
 
-    
     FILE *sourceFile = fopen(path, "w");
     
     if (!sourceFile) {

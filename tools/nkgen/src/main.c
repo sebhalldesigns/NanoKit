@@ -67,13 +67,13 @@ int main(int argc, char *argv[]) {
     printf(">>> GENERATING MODULE \"%s\"\n", moduleName);
     
     /* Parse the file */
-    //FileContents fileContents = ParseFile(inputFileBuffer, inputFileSize, moduleName);
+    FileContents fileContents = ParseFile(inputFileBuffer, inputFileSize, moduleName);
 
     /* Write the header file */
-    //WriteHeaderFile(outputHeader, moduleName, &fileContents);
+    WriteHeaderFile(outputHeader, moduleName, &fileContents);
 
     /* Write the source file */
-    //WriteSourceFile(outputSource, moduleName, &fileContents);
+    WriteSourceFile(outputSource, moduleName, &fileContents);
     
     printf("<<< DONE\n");
 

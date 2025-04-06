@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <xml.h>
+#include <xml/xml.h>
 
 #include "header.h"
 
@@ -35,23 +35,48 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
+static char* outputBuffer = NULL;
+static size_t outputBufferSize = 0;
+static size_t positionInFile = 0;
+
+static char moduleNameBuffer[256];
+static char moduleNameUpper[256];
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
+
+static void ProcessWindow(Window* window);
+static void ProcessRootView(RootView* rootView);
+static void ProcessView(View* view);
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-void WriteHeaderFile(const char* path, const char* moduleName)
+void WriteHeaderFile(const char* path, const char* moduleName, FileContents* fileContents)
 {
-    char moduleNameUpper[256];
+
+    if (outputBuffer != NULL) 
+    {
+        free(outputBuffer);
+    }
+
+    outputBufferSize = 1024 * 1024; // 1 MB
+    outputBuffer = (char*)malloc(outputBufferSize);
+    if (outputBuffer == NULL) {
+        fprintf(stderr, "Error: Could not allocate memory for output buffer\n");
+        exit(1);
+    }
+
+    sprintf(moduleNameBuffer, "%s", moduleName);
+    
     for (size_t i = 0; moduleName[i] != '\0'; i++) {
         moduleNameUpper[i] = (moduleName[i] >= 'a' && moduleName[i] <= 'z') ? moduleName[i] - 32 : moduleName[i];
     }
     moduleNameUpper[strlen(moduleName)] = '\0';
 
-    int positionInFile = snprintf(outputBuffer, outputBufferSize, 
+    positionInFile = snprintf(outputBuffer, outputBufferSize, 
 "/***************************************************************\n\
 **\n\
 ** NanoKit Generated Header File\n\
@@ -78,19 +103,17 @@ void %s_Destroy(void);\n\
         moduleNameUpper
         );
 
-    for (View* currentView = window->rootView; currentView != NULL; currentView = currentView->next)
+
+    /* PRINT OUT CALLBACK FUNCTIONS */
+
+    if (fileContents->rootNodeType == ROOT_NODE_WINDOW)
     {
-        if (currentView->clickCallback != NULL)
-        {
-            positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
-"#ifdef %s_BUILD\n\
-    void %s(void);\n\
-#endif\n\
-\n",
-                moduleNameUpper,
-                currentView->clickCallback
-            );
-        }
+
+        ProcessWindow((Window*)fileContents->rootNode);
+    }
+    else
+    {
+        ProcessRootView((RootView*)fileContents->rootNode);
     }
 
     positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
@@ -98,7 +121,6 @@ void %s_Destroy(void);\n\
 #endif /*%s_XML_H*/\n",
         moduleNameUpper
     );
-
 
     FILE *headerFile = fopen(path, "w");
     
@@ -117,3 +139,46 @@ void %s_Destroy(void);\n\
 /***************************************************************
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
+
+
+static void ProcessWindow(Window* window)
+{
+    if (window->Content != NULL)
+    {
+        ProcessView(window->Content);
+    }
+}
+
+static void ProcessRootView(RootView* rootView)
+{
+    if (rootView->Content != NULL)
+    {
+        ProcessView(rootView->Content);
+    }
+}
+
+static void ProcessView(View* view)
+{
+    if (view->ClickFunction != NULL)
+    {
+        positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
+"#ifdef %s_BUILD\n\
+    void %s(void);\n\
+#endif\n\
+\n",
+            moduleNameUpper,
+            view->ClickFunction
+        );
+    }
+
+    if (view->Content != NULL)
+    {
+        ProcessView(view->Content);
+    }
+
+    if (view->Next != NULL)
+    {
+        ProcessView(view->Next);
+    }
+    
+}

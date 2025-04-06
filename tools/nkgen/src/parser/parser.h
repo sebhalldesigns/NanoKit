@@ -44,6 +44,14 @@ typedef struct
     float Bottom;
 } Thickness;
 
+typedef enum
+{
+    PARENT_TYPE_NONE,
+    PARENT_TYPE_WINDOW,
+    PARENT_TYPE_ROOT_VIEW,
+    PARENT_TYPE_VIEW
+} ParentType;
+
 typedef struct View
 {
     const char* Class;
@@ -62,13 +70,15 @@ typedef struct View
     DockLocation DockLocation;
     
     struct View* Next;
+    ParentType ParentType;
+    void* Parent;
 } View;
  
 
 typedef struct RootView
 {
     /* set with Class */
-    const char* ClassDef;
+    const char* Class;
 
     /* content */
     View* Content;
@@ -78,7 +88,7 @@ typedef struct RootView
 typedef struct Window
 {
     /* set with Class */
-    const char* ClassDef;
+    const char* Class;
 
     /* properties */
     const char* Title;
@@ -92,6 +102,7 @@ typedef struct Window
 
 typedef enum
 {
+    ROOT_NODE_NONE,
     ROOT_NODE_WINDOW,
     ROOT_NODE_VIEW
 } RootNodeType;
@@ -99,13 +110,7 @@ typedef enum
 typedef struct
 {
     RootNodeType rootNodeType;
-
-    union 
-    {
-        Window* window;
-        RootView* rootView;
-    } rootNode;
-
+    void* rootNode;
 } FileContents;
 
 /***************************************************************

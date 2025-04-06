@@ -19,7 +19,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <xml.h>
+#include <xml/xml.h>
 
 #include "parser.h"
 
@@ -35,9 +35,15 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
+static Window *window = NULL;
+static RootView *rootView = NULL;
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
+
+static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentType, void* parent);
+
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
@@ -45,6 +51,9 @@
 
 FileContents ParseFile(char* contents, size_t size, const char* moduleName)
 {
+    window = NULL;
+    rootView = NULL;
+
     struct xml_document* document = xml_parse_document(contents, size);
 
     if (!document) {
@@ -52,9 +61,27 @@ FileContents ParseFile(char* contents, size_t size, const char* moduleName)
         exit(1);
     }
 
+    ProcessNode(xml_document_root(document), 0, PARENT_TYPE_NONE, NULL);
+
     FileContents fileContents = {0};
 
-    return;
+    if (window != NULL && rootView == NULL)
+    {
+        fileContents.rootNodeType = ROOT_NODE_WINDOW;
+        fileContents.rootNode = (void*)window;
+    }
+    else if (window == NULL && rootView != NULL)
+    {
+        fileContents.rootNodeType = ROOT_NODE_VIEW;
+        fileContents.rootNode = (void*)rootView;
+    }
+    else
+    {
+        fprintf(stderr, "Error: No valid XML structure found\n");
+        exit(1);
+    }
+
+    return fileContents;  
 }
 
 /***************************************************************
@@ -62,7 +89,7 @@ FileContents ParseFile(char* contents, size_t size, const char* moduleName)
 ***************************************************************/
 
 
-void ProcessNode(struct xml_node* node, size_t depth)
+static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentType, void* parent)
 {
     struct xml_string* nodeClassObject = xml_node_name(node);
 
@@ -71,31 +98,30 @@ void ProcessNode(struct xml_node* node, size_t depth)
     xml_string_copy(nodeClassObject, nodeClass, xml_string_length(nodeClassObject));
     printf("Processing node of class: %s\n", nodeClass);
 
+    
     View* view = NULL;
+    ParentType viewParentType = parentType;
+    void* viewParent = parent;
 
     size_t attributesCount = xml_node_attributes(node);
 
-
     if (depth == 0)
     {
-        if (window != NULL)
+        if (window != NULL || rootView != NULL)
         {
             fprintf(stderr, "Error: Multiple root nodes\n");
             exit(1);
         }
-        else if (strcmp(nodeClass, "Window") != 0)
-        {
-            fprintf(stderr, "Error: Unsupported XML root class of %s\n", nodeClass);
-            exit(1);
-
-        }
-        else
+        else if (strcmp(nodeClass, "Window") == 0)
         {
             window = (Window *)malloc(sizeof(Window));
-            window->title = "Window";
-            window->width = 800;
-            window->height = 600;
-            window->rootView = NULL;
+            window->Class = nodeClass;
+            window->Title = "Window";
+            window->Width = 800;
+            window->Height = 600;
+            window->Content = NULL;
+            viewParentType = PARENT_TYPE_WINDOW;
+            viewParent = window;
 
             for (size_t i = 0; i < attributesCount; i++) {
                 struct xml_string* attributeNameObject = xml_node_attribute_name(node, i);
@@ -111,36 +137,70 @@ void ProcessNode(struct xml_node* node, size_t depth)
         
                 if (strcmp("Title", attributeName) == 0)
                 {
-                    window->title = attributeContent;
+                    window->Title = attributeContent;
                 }
                 else if (strcmp("Width", attributeName) == 0)
                 {
-                    window->width = atoi(attributeContent);
+                    window->Width = atoi(attributeContent);
                 }
                 else if (strcmp("Height", attributeName) == 0)
                 {
-                    window->height = atoi(attributeContent);
+                    window->Height = atoi(attributeContent);
                 }
         
                 free(attributeName);
                 free(attributeContent);
             }
+        }
+        else if (strcmp(nodeClass, "View") == 0)
+        {
+            rootView = (RootView *)malloc(sizeof(RootView));
+            rootView->Class = nodeClass;
+            rootView->Content = NULL;
+            viewParentType = PARENT_TYPE_ROOT_VIEW;
+            viewParent = rootView;
 
+            for (size_t i = 0; i < attributesCount; i++) {
+                struct xml_string* attributeNameObject = xml_node_attribute_name(node, i);
+                struct xml_string* attributeContentObject = xml_node_attribute_content(node, i);
+        
+                const char* attributeName = calloc(xml_string_length(attributeNameObject) + 1, 1);
+                xml_string_copy(attributeNameObject, attributeName, xml_string_length(attributeNameObject));
+        
+                const char* attributeContent = calloc(xml_string_length(attributeContentObject) + 1, 1);
+                xml_string_copy(attributeContentObject, attributeContent, xml_string_length(attributeContentObject));
+        
+                printf("Attribute: %s = %s\n", attributeName, attributeContent);
+
+                
+                free(attributeName);
+                free(attributeContent);
+            }
+        }
+        else
+        {
+            fprintf(stderr, "Error: Unsupported XML root class of %s\n", nodeClass);
+            exit(1);
         }
     }
     else
     {
-        if (window != NULL && window->rootView != NULL && depth == 1)
+        if (window != NULL && window->Content != NULL && depth == 1)
         {
             fprintf(stderr, "Error: Multiple root views\n");
             exit(1);
         }
 
         view = (View *)malloc(sizeof(View));
-        view->class = nodeClass;
-        view->clickCallback = NULL;
-        view->child = NULL;
-        view->next = NULL;
+        view->Class = nodeClass;
+        view->ClickFunction = NULL;
+        view->Content = NULL;
+        view->Next = NULL;
+        view->ParentType = viewParentType;
+        view->Parent = viewParent;
+
+        viewParentType = PARENT_TYPE_VIEW;
+        viewParent = view;
 
         for (size_t i = 0; i < attributesCount; i++) {
             struct xml_string* attributeNameObject = xml_node_attribute_name(node, i);
@@ -156,7 +216,9 @@ void ProcessNode(struct xml_node* node, size_t depth)
     
             if (strcmp("Click", attributeName) == 0)
             {
-                view->clickCallback = attributeContent;
+                
+                view->ClickFunction = calloc(xml_string_length(attributeContentObject) + 1, 1);
+                xml_string_copy(attributeContentObject, view->ClickFunction, xml_string_length(attributeContentObject));
             }
     
             free(attributeName);
@@ -165,28 +227,27 @@ void ProcessNode(struct xml_node* node, size_t depth)
 
         if (window != NULL)
         {
-            if (window->rootView == NULL)
+            if (window->Content == NULL)
             {
-                window->rootView = view;
+                window->Content = view;
             }
             else
             {
-                View* currentView = window->rootView;
-                while (currentView->next != NULL)
+                View* currentView = window->Content;
+                while (currentView->Next != NULL)
                 {
-                    currentView = currentView->next;
+                    currentView = currentView->Next;
                 }
-                currentView->next = view;
+                currentView->Next = view;
             }
         }
         
     }
 
-
     size_t childrenCount = xml_node_children(node);
 
     for (size_t i = 0; i < childrenCount; i++) {
-        ProcessNode(xml_node_child(node, i), depth + 1);
+        ProcessNode(xml_node_child(node, i), depth + 1, viewParentType, viewParent);
     }
 
     free(nodeClass);
