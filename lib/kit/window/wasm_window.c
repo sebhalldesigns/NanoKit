@@ -21,7 +21,11 @@
 
 #include <stdio.h>
 
-#define NANOVG_GL3_IMPLEMENTATION
+#include <emscripten.h>
+#include <emscripten/html5.h>
+#include <GLES3/gl3.h>
+
+#define NANOVG_GLES3_IMPLEMENTATION
 #include <extern/nanovg/src/nanovg_gl.h>
 
 /***************************************************************
@@ -117,14 +121,14 @@ NVGcontext *GetNanoVGContext(PlatformWindowHandle window)
   
 }
 
-Size GetWindowSize(PlatformWindowHandle window)
+nkSize GetWindowSize(PlatformWindowHandle window)
 {
     if (!window)
     {
-        return (Size){0, 0};
+        return (nkSize){0, 0};
     }
 
-            return (Size){0, 0};
+            return (nkSize){0, 0};
 
 }
 

@@ -40,9 +40,8 @@ elseif(EMSCRIPTEN)
     message("    - DETECTED WASM")
 
     set(PLATFORM_SOURCE
-        wasm/thread.c
-        wasm/window.c
-        wasm/event.c
+        window/wasm_window.c
+        app/wasm_app.c
     )
 
 

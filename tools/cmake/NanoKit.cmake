@@ -11,9 +11,15 @@ function(generate_modules target)
     set(GEN_DIR "${CMAKE_BINARY_DIR}/generated")
     file(MAKE_DIRECTORY "${GEN_DIR}")
     
-    # Get the path to the nkgen executable
-    set(NKGEN "$<TARGET_FILE:nkgen>")
+    if(EMSCRIPTEN)
+        # Set the nkgen executable path for Emscripten
+        set(NKGEN "${CMAKE_BINARY_DIR}/nkgen/nkgen")
+    else()
+       # Get the path to the nkgen executable
+        set(NKGEN "$<TARGET_FILE:nkgen>")
+    endif()
 
+    
     set(NANOKIT_DIR "${CMAKE_CURRENT_FUNCTION_LIST_DIR}/../../lib")
 
     foreach(mod ${modules})
@@ -35,7 +41,7 @@ function(generate_modules target)
             OUTPUT ${gen_header} ${gen_src}  # These files are the output of the custom command
             COMMAND ${NKGEN} ${mod_base} ${xml_file} ${gen_header} ${gen_src}
             COMMENT "RUNNING NKGEN ${mod_base} ${xml_file} ${gen_header} ${gen_src}"
-            DEPENDS ${xml_file}             # nkgen depends on the .xml file
+            DEPENDS ${xml_file} nkgen            # nkgen depends on the .xml file
             WORKING_DIRECTORY "${CMAKE_BINARY_DIR}"
             VERBATIM
         )

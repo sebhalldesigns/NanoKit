@@ -16,7 +16,7 @@
 ***************************************************************/
 
 
-#include <pal/api/event/event.h>
+#include "platform_app.h"
 
 #include <kit/log/log.h>
 
