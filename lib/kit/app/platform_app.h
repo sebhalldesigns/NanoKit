@@ -2,8 +2,8 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  event.h
-** Module       :  event
+** File         :  platform_app.h
+** Module       :  app
 ** Author       :  SH
 ** Created      :  2025-02-13 (YYYY-MM-DD)
 ** License      :  MIT
@@ -11,8 +11,8 @@
 **
 ***************************************************************/
 
-#ifndef EVENT_H
-#define EVENT_H
+#ifndef PLATFORM_EVENT_H
+#define PLATFORM_EVENT_H
 
 /***************************************************************
 ** MARK: INCLUDES
@@ -21,7 +21,7 @@
 #include <stdbool.h>
 #include <stddef.h>
 
-#include <pal/api/window/window.h>
+#include "../window/platform_window.h"
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -87,4 +87,4 @@ typedef void (*EventCallback)(PlatformWindowHandle window, Event event);
 
 int RunLoop(EventCallback callback);
 
-#endif /* EVENT_H */
+#endif /* PLATFORM_EVENT_H */

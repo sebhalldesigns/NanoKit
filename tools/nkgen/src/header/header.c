@@ -147,7 +147,7 @@ void %s_Destroy(%s*);\n\
     fprintf(headerFile, "%s", outputBuffer);
     fclose(headerFile);
 
-    printf("Wrote header file: %s\n", path);
+    printf("    - Wrote header file: %s\n", path);
 }
 
 

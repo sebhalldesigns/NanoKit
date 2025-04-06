@@ -101,7 +101,7 @@ static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentTy
     /* get class */
     const char* nodeClass = calloc(xml_string_length(nodeClassObject) + 1, 1);
     xml_string_copy(nodeClassObject, nodeClass, xml_string_length(nodeClassObject));
-    printf("Processing node of class: %s\n", nodeClass);
+    //printf("Processing node of class: %s\n", nodeClass);
 
     
     View* view = NULL;
@@ -148,7 +148,7 @@ static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentTy
                 const char* attributeContent = calloc(attributeContentLength + 1, 1);
                 sprintf(attributeContent, "%.*s", (int)attributeContentLength, attributeContentObjectString);
         
-                printf("Attribute: %s = %s\n", attributeName, attributeContent);
+                //printf("Attribute: %s = %s\n", attributeName, attributeContent);
         
                 if (strcmp("Title", attributeName) == 0)
                 {
@@ -187,8 +187,7 @@ static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentTy
                 const char* attributeContent = calloc(xml_string_length(attributeContentObject) + 1, 1);
                 xml_string_copy(attributeContentObject, attributeContent, xml_string_length(attributeContentObject));
         
-                printf("Attribute: %s = %s\n", attributeName, attributeContent);
-
+                //printf("Attribute: %s = %s\n", attributeName, attributeContent);
                 
                 free(attributeName);
                 free(attributeContent);
@@ -229,7 +228,7 @@ static void ProcessNode(struct xml_node* node, size_t depth, ParentType parentTy
             const char* attributeContent = calloc(xml_string_length(attributeContentObject) + 1, 1);
             xml_string_copy(attributeContentObject, attributeContent, xml_string_length(attributeContentObject));
     
-            printf("Attribute: %s = %s\n", attributeName, attributeContent);
+           // printf("Attribute: %s = %s\n", attributeName, attributeContent);
     
             if (strcmp("Click", attributeName) == 0)
             {

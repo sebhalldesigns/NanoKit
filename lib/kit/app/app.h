@@ -28,20 +28,12 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef void (*AppLaunchedCallback)(void *app);
-
-typedef struct
-{
-    const char* name;
-    const char* description;
-    AppLaunchedCallback launchedCallback;
-} App;
-
+typedef void (*AppLaunchedCallback)();
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-int RunApp(App *app);
+int RunApp(AppLaunchedCallback appLaunched);
 
 #endif /* APP_H */

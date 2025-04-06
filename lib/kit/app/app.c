@@ -16,9 +16,11 @@
 ***************************************************************/
 
 #include "app.h"
+#include "platform_app.h"
+#include "../window/platform_window.h"
+
 #include "../log/log.h"
 
-#include "../pal/api/event/event.h"
 #include "../window/window.h"
 #include "../view/view.h"
 
@@ -47,21 +49,18 @@ void WindowEventCallback(PlatformWindowHandle window, Event event);
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunApp(App *app)
+int RunApp(AppLaunchedCallback appLaunched)
 {
-    if (!app)
+    if (!appLaunched && GetNumberOfWindows() < 1)
     {
-        LogError("App is NULL");
+        LogError("App launched callback is NULL with no windows created");
         return 1;
     }
 
-    if (!app->launchedCallback)
+    if (appLaunched)
     {
-        LogError("App launched callback is NULL");
-        return 1;
+        appLaunched();
     }
-
-    app->launchedCallback(app);
 
     int statusCode = RunLoop(WindowEventCallback);
 
@@ -73,6 +72,7 @@ int RunApp(App *app)
 /***************************************************************
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
+
 
 void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
 {
@@ -91,14 +91,14 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
             printf("Window resized to %dx%d\n", event.windowResize.width, event.windowResize.height);
             if (window->ResizeCallback)
             {
-                (window->ResizeCallback)(window, (Size){event.windowResize.width, event.windowResize.height});
+                (window->ResizeCallback)(window, (nkSize){event.windowResize.width, event.windowResize.height});
             }
 
             /* resize the root view */
             if (window->Content)
             {
-                window->Content->frame.size.width = event.windowResize.width;
-                window->Content->frame.size.height = event.windowResize.height;
+                window->Content->Frame.Size.Width = event.windowResize.width;
+                window->Content->Frame.Size.Height = event.windowResize.height;
 
                 LayoutView(window->Content);
             }

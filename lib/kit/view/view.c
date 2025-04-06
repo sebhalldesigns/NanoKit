@@ -36,13 +36,6 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
-static ViewClass *viewClasses = NULL;
-static size_t viewClassCount = 0;
-
-extern ViewClass *libraryViewClasses;
-extern size_t libraryViewClassesCount;
-
-
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
@@ -51,88 +44,44 @@ extern size_t libraryViewClassesCount;
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-void RegisterViewClass(ViewClass *viewClass)
-{
-    if (viewClasses == NULL)
-    {
-        viewClasses = (ViewClass *)malloc(sizeof(ViewClass));
-    }
-    else
-    {
-        viewClasses = (ViewClass *)realloc(viewClasses, sizeof(ViewClass) * (viewClassCount + 1));
-    }
 
-    viewClasses[viewClassCount] = *viewClass;
-    viewClassCount++;
-
-    LogInfo("Registered View Class: %s", viewClass->name);
-}
-
-ViewClass *GetViewClassByName(const char *name)
-{
-    for (size_t i = 0; i < viewClassCount; i++)
-    {
-        if (strcmp(viewClasses[i].name, name) == 0)
-        {
-            return &viewClasses[i];
-        }
-    }
-
-    for (size_t i = 0; i < libraryViewClassesCount; i++)
-    {
-        if (strcmp(libraryViewClasses[i].name, name) == 0)
-        {
-            return &libraryViewClasses[i];
-        }
-    }
-
-    LogWarn("View Class not found: %s", name);
-
-    return NULL;
-}
-
-View *CreateView(ViewClass *viewClass)
+nkView *CreateView()
 {
 
-    View *view = (View *)malloc(sizeof(View));
-    view->class = viewClass;
-    view->frame = (Rect){0, 0, 0, 0};
-    view->data = NULL;
-    view->parent = NULL;
-    view->subviews = NULL;
-    view->subviewCount = 0;
+    nkView *view = (nkView *)malloc(sizeof(nkView));
+    view->Frame = (nkRect){0, 0, 0, 0};
+    view->Data = NULL;
+    view->DataSize = 0;
+    view->Parent = NULL;
+    view->Subviews = NULL;
+    view->SubviewCount = 0;
 
-    view->textureAttachment = 0;
+    //view->textureAttachment = 0;
 
     return view;
 
 }
 
-void DestroyView(View *view)
+void DestroyView(nkView *view)
 {
     return;
 }
 
-void LayoutView(View *view)
+void LayoutView(nkView *view)
 {
-    if (view->class && view->class->layoutCallback)
+    for (size_t i = 0; i < view->SubviewCount; i++)
     {
-        (view->class->layoutCallback)(view);
-    }
-
-    for (size_t i = 0; i < view->subviewCount; i++)
-    {
-        LayoutView(&view->subviews[i]);
+        LayoutView(&view->Subviews[i]);
     }
 }
 
-void RenderView(View *view)
+void RenderView(nkView *view)
 {
-    if (view->textureAttachment == 0)
+    /*if (view->TextureAttachment == 0) */
     {
 
         /* create texture attachment */
-        printf("Creating texture attachment\n");
+        //printf("Creating texture attachment\n");
 
         /*
         glGenTextures(1, &view->textureAttachment);

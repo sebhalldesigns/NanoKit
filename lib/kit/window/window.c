@@ -52,11 +52,9 @@ nkWindow *CreateWindow(const char* title, int width, int height)
         return NULL;
     }
 
-
-
     window->Title = title;
-    window->Size.width = width;
-    window->Size.height = height;
+    window->Size.Width = width;
+    window->Size.Height = height;
 
     window->Content = NULL;
     window->ResizeCallback = NULL;

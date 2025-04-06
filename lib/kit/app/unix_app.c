@@ -2,12 +2,12 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  event.c
-** Module       :  win32
+** File         :  unix_app.c
+** Module       :  app
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Win32 Event Loop
+** Description  :  Unix App Implementation
 **
 ***************************************************************/
 
@@ -16,9 +16,10 @@
 ***************************************************************/
 
 
-#include <pal/api/event/event.h>
+#include "platform_app.h"
 
-#include <pal/unix/x11_window.h>
+#include "../window/unix_window.h"
+
 #include <kit/log/log.h>
 
 #include <stdio.h>
@@ -63,7 +64,7 @@ int RunLoop(EventCallback callback)
     XEvent xEvent;
     Window xWindow;
 
-    X11Window *window = NULL;
+    nkUnixWindow *window = NULL;
     Event event = {0};
 
     printf("Entering event loop\n");

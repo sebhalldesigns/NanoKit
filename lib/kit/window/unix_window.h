@@ -2,8 +2,8 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  x11_window.h
-** Module       :  unix
+** File         :  unix_window.h
+** Module       :  window
 ** Author       :  SH
 ** Created      :  2025-02-16 (YYYY-MM-DD)
 ** License      :  MIT
@@ -11,8 +11,8 @@
 **
 ***************************************************************/
 
-#ifndef X11_WINDOW_H
-#define X11_WINDOW_H
+#ifndef UNIX_WINDOW_H
+#define UNIX_WINDOW_H
 
 /***************************************************************
 ** MARK: INCLUDES
@@ -27,6 +27,9 @@
 
 #include <extern/nanovg/src/nanovg.h>
 
+#include "platform_window.h"
+
+
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
 ***************************************************************/
@@ -35,7 +38,7 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef struct X11Window
+typedef struct nkUnixWindow
 {
     Window window;
     Atom deleteMessage;
@@ -47,16 +50,16 @@ typedef struct X11Window
     size_t height;
 
     void *data;
-} X11Window;
+} nkUnixWindow;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-bool GetWindowFromHandle(Window hwnd, X11Window **window);
+bool GetWindowFromHandle(Window hwnd, nkUnixWindow **window);
 size_t GetNumberOfWindows();
 
 Display *GetDisplay();
 
 
-#endif /* X11_WINDOW_H */
+#endif /* UNIX_WINDOW_H */

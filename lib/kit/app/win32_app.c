@@ -2,12 +2,12 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  event.c
-** Module       :  win32
+** File         :  win32_app.c
+** Module       :  app
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Win32 Event Loop
+** Description  :  Win32 App Implementation
 **
 ***************************************************************/
 
@@ -15,11 +15,10 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
+#include "platform_app.h"
+#include "win32_app.h"
+#include "../window/win32_window.h"
 
-#include <pal/api/event/event.h>
-#include <pal/win32/win32_event.h>
-
-#include <pal/win32/win32_window.h>
 #include <kit/log/log.h>
 
 #include <stdio.h>
@@ -91,7 +90,7 @@ int RunLoop(EventCallback callback)
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    Win32Window *window = NULL;
+    nkWin32Window *window = NULL;
     if (!GetWindowFromHwnd(hwnd, &window))
     {
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
@@ -105,11 +104,11 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             event.type = EVENT_WINDOW_RESIZE;
 
-            window->width = LOWORD(lParam);
-            window->height = HIWORD(lParam);  
+            window->Width = LOWORD(lParam);
+            window->Height = HIWORD(lParam);  
 
-            event.windowResize.width = window->width;
-            event.windowResize.height = window->height;
+            event.windowResize.width = window->Width;
+            event.windowResize.height = window->Height;
 
             (eventCallback)((PlatformWindowHandle)window, event);
         } break;

@@ -21,16 +21,60 @@ endfunction()
 
 message(">>> CONFIGURING NANOKIT")
 
+if(WIN32)
+
+    message("    - DETECTED WINDOWS")
+
+    set(PLATFORM_SOURCE
+        window/win32_window.c
+        app/win32_app.c
+    )
+
+    set(PLATFORM_DEPENDENCIES
+        user32
+        opengl32
+    )
+
+elseif(EMSCRIPTEN)
+    
+    message("    - DETECTED WASM")
+
+    set(PLATFORM_SOURCE
+        wasm/thread.c
+        wasm/window.c
+        wasm/event.c
+    )
+
+
+elseif(UNIX)
+
+    message("    - DETECTED UNIX")
+
+    set(PLATFORM_SOURCE
+        window/unix_window.c
+        app/unix_app.c
+    )
+
+    set(PLATFORM_DEPENDENCIES
+        X11
+        GL
+        m
+    )
+else()
+    message(FATAL_ERROR "UNSUPPORTED PLATFORM: ${CMAKE_SYSTEM_NAME}")
+endif()
+
 add_library(NanoKit STATIC
+    ${PLATFORM_SOURCE}
     log/log.c
     app/app.c
     view/view.c
-    view/view_library.c
     window/window.c
 )
 
 target_link_libraries(NanoKit PRIVATE
-   NanoKit-PAL
+    ${PLATFORM_DEPENDENCIES}
+    NanoKit-Extern
 )
 
 target_include_directories(NanoKit PUBLIC

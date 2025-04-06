@@ -91,9 +91,11 @@ void WriteSourceFile(const char* path, const char* moduleName, FileContents* fil
         );
 
     positionInFile += snprintf(outputBuffer + positionInFile, outputBufferSize - positionInFile,
-        "#include \"%.*s.xml.h\"\n\
+        "#include \"%s.xml.h\"\n\
 #include <stdio.h>\n\
-\n");
+\n", 
+        moduleName
+    );
 
     if (fileContents->rootNodeType == ROOT_NODE_WINDOW)
     {
@@ -114,7 +116,7 @@ void WriteSourceFile(const char* path, const char* moduleName, FileContents* fil
     fprintf(sourceFile, "%s", outputBuffer);
     fclose(sourceFile);
 
-    printf("Wrote source file: %s\n", path);
+    printf("    - Wrote source file: %s\n", path);
 }   
 
 

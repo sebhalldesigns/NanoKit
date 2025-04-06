@@ -2,12 +2,12 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  window.c
-** Module       :  unix
+** File         :  unix_window.c
+** Module       :  window
 ** Author       :  SH
 ** Created      :  2025-02-16 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Unix window API
+** Description  :  Unix Window Implementation
 **
 ***************************************************************/
 
@@ -15,8 +15,8 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <pal/api/window/window.h>
-#include <pal/unix/x11_window.h>
+#include "unix_window.h"
+
 
 #include <kit/log/log.h>
 
@@ -77,7 +77,7 @@ XSetWindowAttributes windowAttributes;
 static bool initialized = false;
 
 static size_t windowCount = 0;
-static X11Window **windows = NULL;
+static nkUnixWindow **windows = NULL;
 
 static GLXContext currentGlrc = NULL;
 
@@ -182,7 +182,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
 
     currentGlrc = context;
 
-    X11Window *window = (X11Window *)malloc(sizeof(X11Window));
+    nkUnixWindow *window = (nkUnixWindow *)malloc(sizeof(nkUnixWindow));
     window->window = xWnd;
     window->deleteMessage = deleteAtom;
     window->glContext = context;
@@ -193,7 +193,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     window->data = data;
 
     windowCount++;
-    windows = (X11Window **)realloc(windows, windowCount * sizeof(X11Window));
+    windows = (nkUnixWindow **)realloc(windows, windowCount * sizeof(nkUnixWindow));
     windows[windowCount - 1] = window;
 
     return (PlatformWindowHandle)window;
@@ -207,14 +207,14 @@ void FreePlatformWindow(PlatformWindowHandle window)
     }
 
 
-    if (currentGlrc == ((X11Window *)window)->glContext)
+    if (currentGlrc == ((nkUnixWindow *)window)->glContext)
     {
         glXMakeCurrent(display, None, NULL);
 
         currentGlrc = NULL;
     }
 
-    X11Window *x11Window = (X11Window *)window;
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
 
     XDestroyWindow(display, x11Window->window);
     free(x11Window);
@@ -232,7 +232,7 @@ void FreePlatformWindow(PlatformWindowHandle window)
     }
 
     windowCount--;
-    windows = (X11Window **)realloc(windows, windowCount * sizeof(X11Window));
+    windows = (nkUnixWindow **)realloc(windows, windowCount * sizeof(nkUnixWindow));
 
 }
 
@@ -243,7 +243,7 @@ void *GetPlatformWindowData(PlatformWindowHandle window)
         return NULL;
     }
 
-    X11Window *x11Window = (X11Window *)window;
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
     return x11Window->data;
 }
 
@@ -254,7 +254,7 @@ void BeginPlatformRender(PlatformWindowHandle window)
         return;
     }
 
-    X11Window *x11Window = (X11Window *)window;
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
     
     if (currentGlrc != x11Window->glContext)
     {
@@ -276,7 +276,7 @@ void EndPlatformRender(PlatformWindowHandle window)
         return;
     }
 
-    X11Window *x11Window = (X11Window *)window;
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
 
     glXSwapBuffers(display, x11Window->window);
 
@@ -289,22 +289,22 @@ NVGcontext *GetNanoVGContext(PlatformWindowHandle window)
         return NULL;
     }
 
-    X11Window *x11Window = (X11Window *)window;
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
     return x11Window->nvg;
 }
 
-Size GetWindowSize(PlatformWindowHandle window)
+nkSize GetWindowSize(PlatformWindowHandle window)
 {
     if (!window)
     {
-        return (Size){0, 0};
+        return (nkSize){0, 0};
     }
 
-    X11Window *x11Window = (X11Window *)window;
-    return (Size){x11Window->width, x11Window->height};
+    nkUnixWindow *x11Window = (nkUnixWindow *)window;
+    return (nkSize){x11Window->width, x11Window->height};
 }
 
-bool GetWindowFromHandle(Window xWnd, X11Window **window)
+bool GetWindowFromHandle(Window xWnd, nkUnixWindow **window)
 {
     for (size_t i = 0; i < windowCount; i++)
     {

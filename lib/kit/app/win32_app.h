@@ -2,53 +2,45 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  window.h
-** Module       :  window
+** File         :  win32_app.h
+** Module       :  app
 ** Author       :  SH
-** Created      :  2025-02-13 (YYYY-MM-DD)
+** Created      :  2025-02-15 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Window API
+** Description  :  Win32 App Header
 **
 ***************************************************************/
 
-#ifndef PLATFORMWINDOW_H
-#define PLATFORMWINDOW_H
+#ifndef WIN32_EVENT_H
+#define WIN32_EVENT_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdbool.h>
-#include <stdint.h>
-#include <stddef.h>
-#include <extern/nanovg/src/nanovg.h>
-#include <kit/common/geometry.h>
+#define WIN32_LEAN_AND_MEAN
+
+#ifndef UNICODE
+#define UNICODE
+#endif 
+
+#include <windows.h>
+#include <windowsx.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
 ***************************************************************/
 
+
 /***************************************************************
 ** MARK: TYPEDEFS
 ***************************************************************/
-
-typedef uintptr_t PlatformWindowHandle;
-
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height, void *data);
-void FreePlatformWindow(PlatformWindowHandle window);
+LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-void *GetPlatformWindowData(PlatformWindowHandle window);
 
-void BeginPlatformRender(PlatformWindowHandle window);
-void EndPlatformRender(PlatformWindowHandle window);
-
-NVGcontext *GetNanoVGContext(PlatformWindowHandle window);
-
-Size GetWindowSize(PlatformWindowHandle window);
-
-#endif /* PLATFORMWINDOW_H */
+#endif /* WIN32_WINDOW_H */

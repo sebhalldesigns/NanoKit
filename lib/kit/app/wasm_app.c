@@ -1,13 +1,13 @@
 /***************************************************************
 **
-** NanoKit Library Source File
+** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  drawing.c
-** Module       :  drawing
+** File         :  wasm_app.c
+** Module       :  app
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Cross-platform Vector Graphics
+** Description  :  WASM App Implementation
 **
 ***************************************************************/
 
@@ -15,13 +15,12 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include "drawing.h"
+
+#include <pal/api/event/event.h>
+
+#include <kit/log/log.h>
 
 #include <stdio.h>
-#include <stdarg.h>
-#include <time.h>    
-
-#include <extern/nanovg/src/nanovg.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -35,15 +34,33 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
+static bool exitFlag = false;
+static EventCallback eventCallback = NULL;
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
+
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
+int RunLoop(EventCallback callback)
+{
+
+    if (!callback)
+    {
+        LogError("No callback provided");
+        return -1;
+    }
+        
+
+    return 0;
+
+}
+
+
 /***************************************************************
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
-

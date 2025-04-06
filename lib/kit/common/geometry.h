@@ -30,24 +30,24 @@
 
 typedef struct 
 {
-    float width;
-    float height;
-} Size;
+    float Width;
+    float Height;
+} nkSize;
 
 typedef struct 
 {
-    float x;
-    float y;
-} Point;
+    float X;
+    float Y;
+} nkPoint;
 
 typedef struct 
 {
-    Point origin;
-    Size size;
-} Rect;
+    nkPoint Origin;
+    nkSize Size;
+} nkRect;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-#endif /* VIEW_H */
+#endif /* GEOMETRY_H */

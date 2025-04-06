@@ -2,12 +2,12 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  window.c
-** Module       :  win32
+** File         :  win32_window.c
+** Module       :  window
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Cross-platform event callback
+** Description  :  Win32 Window Implementation
 **
 ***************************************************************/
 
@@ -15,9 +15,8 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <pal/api/window/window.h>
-#include <pal/win32/win32_window.h>
-#include <pal/win32/win32_event.h>
+#include "win32_window.h"
+#include "../app/win32_app.h"
 
 #include <kit/log/log.h>
 
@@ -86,7 +85,7 @@ static wglCreateContextAttribsARB_t *wglCreateContextAttribsARB;
 static wglChoosePixelFormatARB_t* wglChoosePixelFormatARB;
 
 static size_t windowCount = 0;
-static Win32Window **windows = NULL;
+static nkWin32Window **windows = NULL;
 
 static HGLRC currentGlrc = NULL;
 
@@ -186,19 +185,19 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
 
     ShowWindow(hwnd, SW_SHOW);
 
-    Win32Window *window = (Win32Window *)malloc(sizeof(Win32Window));
-    window->hwnd = hwnd;
-    window->hinstance = GetModuleHandle(NULL);
-    window->title = title;
-    window->width = width;
-    window->height = height;
-    window->hdc = gldc;
-    window->hglrc = glrc;
-    window->nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
-    window->data = data;
+    nkWin32Window *window = (nkWin32Window *)malloc(sizeof(nkWin32Window));
+    window->HWnd = hwnd;
+    window->HInstance = GetModuleHandle(NULL);
+    window->Title = title;
+    window->Width = width;
+    window->HDc = height;
+    window->HDc = gldc;
+    window->HGlrc = glrc;
+    window->Nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
+    window->Data = data;
 
     windowCount++;
-    windows = (Win32Window **)realloc(windows, windowCount * sizeof(Win32Window));
+    windows = (nkWin32Window **)realloc(windows, windowCount * sizeof(nkWin32Window));
     windows[windowCount - 1] = window;
 
     return (PlatformWindowHandle)window;
@@ -212,15 +211,15 @@ void FreePlatformWindow(PlatformWindowHandle window)
     }
 
 
-    if (currentGlrc == ((Win32Window *)window)->hglrc)
+    if (currentGlrc == ((nkWin32Window *)window)->HGlrc)
     {
         wglMakeCurrent(NULL, NULL);
         currentGlrc = NULL;
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
+    nkWin32Window *win32Window = (nkWin32Window *)window;
 
-    DestroyWindow(win32Window->hwnd);
+    DestroyWindow(win32Window->HWnd);
     free(win32Window);
 
     for (size_t i = 0; i < windowCount; i++)
@@ -236,7 +235,7 @@ void FreePlatformWindow(PlatformWindowHandle window)
     }
 
     windowCount--;
-    windows = (Win32Window **)realloc(windows, windowCount * sizeof(Win32Window));
+    windows = (nkWin32Window **)realloc(windows, windowCount * sizeof(nkWin32Window));
 
 }
 
@@ -247,8 +246,8 @@ void *GetPlatformWindowData(PlatformWindowHandle window)
         return NULL;
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
-    return win32Window->data;
+    nkWin32Window *win32Window = (nkWin32Window *)window;
+    return win32Window->Data;
 }
 
 void BeginPlatformRender(PlatformWindowHandle window)
@@ -258,21 +257,21 @@ void BeginPlatformRender(PlatformWindowHandle window)
         return;
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
+    nkWin32Window *win32Window = (nkWin32Window *)window;
     
-    if (currentGlrc != win32Window->hglrc)
+    if (currentGlrc != win32Window->HGlrc)
     {
-        wglMakeCurrent(win32Window->hdc, win32Window->hglrc);
-        currentGlrc = win32Window->hglrc;
+        wglMakeCurrent(win32Window->HDc, win32Window->HGlrc);
+        currentGlrc = win32Window->HGlrc;
     }
     
 
-    BeginPaint(win32Window->hwnd, &win32Window->ps);
+    BeginPaint(win32Window->HWnd, &win32Window->PaintStruct);
 
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glViewport(0, 0, win32Window->width, win32Window->height);
+    glViewport(0, 0, win32Window->Width, win32Window->Height);
 
 }
 
@@ -283,10 +282,10 @@ void EndPlatformRender(PlatformWindowHandle window)
         return;
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
-    SwapBuffers(win32Window->hdc);
+    nkWin32Window *win32Window = (nkWin32Window *)window;
+    SwapBuffers(win32Window->HDc);
 
-    EndPaint(win32Window->hwnd, &win32Window->ps);
+    EndPaint(win32Window->HWnd, &win32Window->PaintStruct);
 }
 
 NVGcontext *GetNanoVGContext(PlatformWindowHandle window)
@@ -296,26 +295,26 @@ NVGcontext *GetNanoVGContext(PlatformWindowHandle window)
         return NULL;
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
-    return win32Window->nvg;
+    nkWin32Window *win32Window = (nkWin32Window *)window;
+    return win32Window->Nvg;
 }
 
-Size GetWindowSize(PlatformWindowHandle window)
+nkSize GetWindowSize(PlatformWindowHandle window)
 {
     if (!window)
     {
-        return (Size){0, 0};
+        return (nkSize){0, 0};
     }
 
-    Win32Window *win32Window = (Win32Window *)window;
-    return (Size){win32Window->width, win32Window->height};
+    nkWin32Window *win32Window = (nkWin32Window *)window;
+    return (nkSize){win32Window->Width, win32Window->Height};
 }
 
-bool GetWindowFromHwnd(HWND hwnd, Win32Window **window)
+bool GetWindowFromHwnd(HWND hwnd, nkWin32Window **window)
 {
     for (size_t i = 0; i < windowCount; i++)
     {
-        if (windows[i]->hwnd == hwnd)
+        if (windows[i]->HWnd == hwnd)
         {
             *window = windows[i];
             return true;

@@ -50,7 +50,7 @@ function(generate_modules target)
         target_compile_definitions(${mod_base} PUBLIC "${mod_base_upper}_BUILD")
         target_include_directories(${mod_base} PUBLIC ${GEN_DIR} ${NANOKIT_DIR}/kit ${NANOKIT_DIR})
         message("include directory: ${NANOKIT_DIR}")
-        target_link_libraries(${target} ${mod_base})
+        target_link_libraries(${target} ${mod_base} NanoKit NanoKit-Extern)
         
     endforeach()
 

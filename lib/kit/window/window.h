@@ -23,14 +23,16 @@
 #include "../common/geometry.h"
 
 #include "../view/view.h"
-#include "../pal/api/window/window.h"
+
+#include "platform_window.h"
 
 #ifdef _WIN32
-
     /* Redefine symbols to prevent user32 linker confict */
     #define CreateWindow NanoKit_CreateWindow
     #define DestroyWindow NanoKit_DestroyWindow
+    #define UpdateWindow NanoKit_UpdateWindow
 #endif
+
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -41,17 +43,16 @@
 ***************************************************************/
 
 typedef void (*WindowInitCallback)(void *view);
-typedef void (*WindowResizeCallback)(void *view, Size newSize);
+typedef void (*WindowResizeCallback)(void *view, nkSize newSize);
 typedef void (*WindowRenderCallback)(void *window);
 
 typedef struct 
 {
     const char *Title;
-    Size Size;
+    nkSize Size;
 
-    View *Content;
-
-
+    nkView *Content;
+    
     WindowResizeCallback ResizeCallback;
     WindowRenderCallback RenderCallback;
 

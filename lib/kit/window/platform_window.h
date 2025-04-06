@@ -2,34 +2,29 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  win32_window.h
-** Module       :  win32
+** File         :  window.h
+** Module       :  window
 ** Author       :  SH
-** Created      :  2025-02-15 (YYYY-MM-DD)
+** Created      :  2025-02-13 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Win32 Window Header
+** Description  :  Platform Window API
 **
 ***************************************************************/
 
-#ifndef WIN32_WINDOW_H
-#define WIN32_WINDOW_H
+#ifndef PLATFORMWINDOW_H
+#define PLATFORMWINDOW_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#define WIN32_LEAN_AND_MEAN
-
-#ifndef UNICODE
-#define UNICODE
-#endif 
-
-#include <windows.h>
-#include <windowsx.h>
-
-#include <extern/glad/glad.h>
+#include "../common/geometry.h"
 
 #include <extern/nanovg/src/nanovg.h>
+
+#include <stdbool.h>
+#include <stdint.h>
+#include <stddef.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -39,28 +34,25 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef struct Win32Window
-{
-    HWND hwnd;
-    HINSTANCE hinstance;
-    HDC hdc;
-    HGLRC hglrc;
-    PAINTSTRUCT ps;
-    NVGcontext *nvg;
-
-    const char *title;
-    size_t width;
-    size_t height;
-
-    void *data;
-} Win32Window;
+typedef uintptr_t PlatformWindowHandle;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-bool GetWindowFromHwnd(HWND hwnd, Win32Window **window);
+PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t height, void *data);
+void FreePlatformWindow(PlatformWindowHandle window);
+
+void *GetPlatformWindowData(PlatformWindowHandle window);
+
+void BeginPlatformRender(PlatformWindowHandle window);
+void EndPlatformRender(PlatformWindowHandle window);
+
+NVGcontext *GetNanoVGContext(PlatformWindowHandle window);
+
+nkSize GetWindowSize(PlatformWindowHandle window);
+
 size_t GetNumberOfWindows();
 
 
-#endif /* WIN32_WINDOW_H */
+#endif /* PLATFORMWINDOW_H */

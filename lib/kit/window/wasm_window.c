@@ -2,12 +2,12 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  window.c
-** Module       :  win32
+** File         :  wasm_window.c
+** Module       :  window
 ** Author       :  SH
 ** Created      :  2025-02-09 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Cross-platform event callback
+** Description  :  WASM Window Implementation
 **
 ***************************************************************/
 
@@ -15,14 +15,14 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <pal/api/window/window.h>
+#include "platform_window.h"
 
 #include <kit/log/log.h>
 
 #include <stdio.h>
 
 #define NANOVG_GL3_IMPLEMENTATION
-//#include <extern/nanovg/src/nanovg_gl.h>
+#include <extern/nanovg/src/nanovg_gl.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS

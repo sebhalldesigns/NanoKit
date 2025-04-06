@@ -35,15 +35,6 @@
 typedef void (*ViewLayoutCallback)(void *view); /* possibly have layoutdown and layoutup like WPF? */
 typedef void (*ViewDrawCallback)(void *view);
 
-typedef enum 
-{
-    LAYOUT_TYPE_NONE,
-    LAYOUT_TYPE_DOCK,
-    LAYOUT_TYPE_VSTACK,
-    LAYOUT_TYPE_HSTACK
-} ViewLayoutType;
-
-
 typedef enum
 {
     DOCK_POSITION_TOP,
@@ -52,54 +43,40 @@ typedef enum
     DOCK_POSITION_RIGHT
 } DockPosition;
 
-typedef struct ViewClass
-{
-    const char *name;
-    struct ViewClass * super;   /* optional superclass to inherit from */
-
-    /* Callbacks */
-    ViewLayoutCallback layoutCallback;
-    ViewDrawCallback drawCallback;      /* set to NULL for no drawing */ 
-
-    size_t dataSize;
-
-} ViewClass;
-
 typedef struct View
-{
-    ViewClass *class; /* can be NULL */
+{    
+    nkRect Frame; /* overwritten in layout phase */
     
-    Rect frame;
+    nkSize SizeRequest;
 
-    Size sizeRequest;
+    struct View *Parent; /* can be NULL*/
     
-    void *data;
+    size_t SubviewCount;
+    struct View *Subviews; /* can be NULL*/
 
-    struct View *parent; /* can be NULL*/
-    
-    size_t subviewCount;
-    struct View *subviews; /* can be NULL*/
+    DockPosition DockPosition;
 
-    DockPosition dockPosition;
+    ViewLayoutCallback LayoutCallback; /* called when layout is needed */
+    ViewDrawCallback DrawCallback; /* called when view should be drawn */
 
-    uintptr_t textureAttachment;
-} View;
+
+    void *Data;
+    size_t DataSize;
+
+} nkView;
 
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-void RegisterViewClass(ViewClass *viewClass);
-ViewClass *GetViewClassByName(const char *name);
-
-View *CreateView(ViewClass *viewClass);
-void DestroyView(View *view);
+nkView *CreateView(void);
+void DestroyView(nkView *view);
 
 /* called by system on window resize */
-void LayoutView(View *view);
+void LayoutView(nkView *view);
 
 /* called by system when view should be rendered */
-void RenderView(View *view);
+void RenderView(nkView *view);
 
 #endif /* VIEW_H */
