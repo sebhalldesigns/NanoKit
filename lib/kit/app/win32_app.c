@@ -36,7 +36,7 @@
 ***************************************************************/
 
 static bool exitFlag = false;
-static EventCallback eventCallback = NULL;
+static WindowEventCallback eventCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
@@ -48,7 +48,7 @@ static BOOL WINAPI ConsoleHandler(DWORD signal);
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunLoop(EventCallback callback)
+int RunLoop(WindowEventCallback callback)
 {
 
     if (!callback)
@@ -96,7 +96,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
         return DefWindowProc(hwnd, uMsg, wParam, lParam);
     }
     
-    Event event = {0};
+    WindowEvent event = {0};
 
     switch (uMsg)
     {

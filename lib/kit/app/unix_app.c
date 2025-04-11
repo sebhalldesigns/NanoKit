@@ -37,7 +37,7 @@
 ***************************************************************/
 
 static bool exitFlag = false;
-static EventCallback eventCallback = NULL;
+static WindowEventCallback eventCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
@@ -47,7 +47,7 @@ static EventCallback eventCallback = NULL;
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunLoop(EventCallback callback)
+int RunLoop(WindowEventCallback callback)
 {
 
     if (!callback)
@@ -65,7 +65,7 @@ int RunLoop(EventCallback callback)
     Window xWindow;
 
     nkUnixWindow *window = NULL;
-    Event event = {0};
+    WindowEvent event = {0};
 
     printf("Entering event loop\n");
 

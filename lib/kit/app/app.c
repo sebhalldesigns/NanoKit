@@ -39,11 +39,14 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
+static AppLaunchedCallback appLaunchedCallback = NULL;
+
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
 
-void WindowEventCallback(PlatformWindowHandle window, Event event);
+void AppEventCallback(ApplicationEvent event);
+void WinEventCallback(PlatformWindowHandle window, WindowEvent event);
 
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
@@ -57,12 +60,9 @@ int RunApp(AppLaunchedCallback appLaunched)
         return 1;
     }
 
-    if (appLaunched)
-    {
-        appLaunched();
-    }
+    appLaunchedCallback = appLaunched;
 
-    int statusCode = RunLoop(WindowEventCallback);
+    int statusCode = RunLoop(AppEventCallback, WinEventCallback);
 
     LogInfo("Exiting...");
 
@@ -74,7 +74,26 @@ int RunApp(AppLaunchedCallback appLaunched)
 ***************************************************************/
 
 
-void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
+void AppEventCallback(ApplicationEvent event)
+{
+    switch (event.type)
+    {
+        case APPLICATION_EVENT_LAUNCHED:
+        {
+            if (appLaunchedCallback)
+            {
+                appLaunchedCallback();
+            }
+        } break;
+
+        default:
+        {
+            /* unhandled event */
+        } break;
+    }
+}
+
+void WinEventCallback(PlatformWindowHandle platformWindow, WindowEvent event)
 {
     if (platformWindow == 0)
     {
@@ -85,7 +104,7 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
 
     switch (event.type)
     {
-        case EVENT_WINDOW_RESIZE:
+        case WINDOW_EVENT_RESIZE:
         {
 
             printf("Window resized to %dx%d\n", event.windowResize.width, event.windowResize.height);
@@ -105,7 +124,7 @@ void WindowEventCallback(PlatformWindowHandle platformWindow, Event event)
 
         } break;
 
-        case EVENT_WINDOW_REDRAW:
+        case WINDOW_EVENT_REDRAW:
         {
             
             window->RenderCallback;

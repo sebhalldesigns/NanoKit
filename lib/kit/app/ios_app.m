@@ -2,19 +2,18 @@
 **
 ** NanoKit Platform Abstraction Layer Source File
 **
-** File         :  wasm_app.c
+** File         :  ios_app.m
 ** Module       :  app
 ** Author       :  SH
-** Created      :  2025-02-09 (YYYY-MM-DD)
+** Created      :  2025-04-11 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  WASM App Implementation
+** Description  :  iOS App Implementation
 **
 ***************************************************************/
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
-
 
 #include "platform_app.h"
 
@@ -34,33 +33,33 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
-static bool exitFlag = false;
-static WindowEventCallback eventCallback = NULL;
+static WindowEventCallback windowCallback = NULL;
+static ApplicationEventCallback appCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
 ***************************************************************/
 
-
 /***************************************************************
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunLoop(WindowEventCallback callback)
+int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCallback)
 {
-
     if (!callback)
     {
         LogError("No callback provided");
         return -1;
     }
-        
+
+    eventCallback = callback;
+
 
     return 0;
 
 }
 
-
 /***************************************************************
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
+

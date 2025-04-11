@@ -7,7 +7,7 @@
 ** Author       :  SH
 ** Created      :  2025-02-13 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Event API
+** Description  :  WindowEvent API
 **
 ***************************************************************/
 
@@ -33,19 +33,19 @@
 
 typedef enum 
 {
-    EVENT_WINDOW_RESIZE,
-    EVENT_WINDOW_CLOSE,
-    EVENT_WINDOW_REDRAW,
-    EVENT_MOUSE_MOVE,
-    EVENT_MOUSE_DOWN,
-    EVENT_MOUSE_UP,
-    EVENT_KEY_DOWN,
-    EVENT_KEY_UP
-} EventType;
+    WINDOW_EVENT_RESIZE,
+    WINDOW_EVENT_CLOSE,
+    WINDOW_EVENT_REDRAW,
+    WINDOW_EVENT_MOUSE_MOVE,
+    WINDOW_EVENT_MOUSE_DOWN,
+    WINDOW_EVENT_MOUSE_UP,
+    WINDOW_EVENT_KEY_DOWN,
+    WINDOW_EVENT_KEY_UP
+} WindowEventType;
 
 typedef struct 
 {
-    EventType type;
+    WindowEventType type;
     union 
     {
         struct 
@@ -77,14 +77,26 @@ typedef struct
             int key;
         } keyUp;
     };
-} Event;    
+} WindowEvent;    
 
-typedef void (*EventCallback)(PlatformWindowHandle window, Event event);
+typedef enum 
+{
+    APPLICATION_EVENT_LAUNCHED
+} ApplicationEventType;
+
+typedef struct 
+{
+    ApplicationEventType type;
+  
+} ApplicationEvent;
+
+typedef void (*WindowEventCallback)(PlatformWindowHandle window, WindowEvent event);
+typedef void (*ApplicationEventCallback)(ApplicationEvent event);
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-int RunLoop(EventCallback callback);
+int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCallback);
 
 #endif /* PLATFORM_EVENT_H */

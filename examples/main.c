@@ -9,7 +9,7 @@
 PlatformWindowHandle window1;
 int segoe;
 
-void Callback(PlatformWindowHandle window, Event event)
+void Callback(PlatformWindowHandle window, WindowEvent event)
 {
     switch (event.type)
     {

@@ -44,6 +44,37 @@ elseif(EMSCRIPTEN)
         app/wasm_app.c
     )
 
+elseif(DEFINED BUILD_IOS)
+
+    message("    - DETECTED IOS")
+
+    set(PLATFORM_SOURCE
+        window/ios_window.c
+        app/ios_app.c
+    )
+    
+    set(PLATFORM_DEPENDENCIES
+        "-framework Foundation"
+        "-framework UIKit"
+    )
+
+elseif(APPLE)
+
+    message("    - DETECTED MACOS")
+
+    set(PLATFORM_SOURCE
+        window/macos_window.m
+        app/macos_app.m
+    )
+
+    set(PLATFORM_DEPENDENCIES
+        "-framework Cocoa"
+        "-framework OpenGL"
+        "-framework QuartzCore"
+    )
+
+    add_compile_definitions(GL_SILENCE_DEPRECATION)
+    
 
 elseif(UNIX)
 
