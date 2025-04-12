@@ -192,6 +192,8 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     window->nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
     window->data = data;
 
+    nvgCreateFont(window->nvg, "sans", "build/fredoka.ttf");
+
     windowCount++;
     windows = (nkUnixWindow **)realloc(windows, windowCount * sizeof(nkUnixWindow));
     windows[windowCount - 1] = window;
@@ -262,10 +264,43 @@ void BeginPlatformRender(PlatformWindowHandle window)
         currentGlrc = x11Window->glContext;
     }
     
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 
     glViewport(0, 0, x11Window->width, x11Window->height);
+
+    float width = x11Window->width;
+    float height = x11Window->height;
+
+    nvgBeginFrame(x11Window->nvg, width, height, 1.0f);
+    printf("Starting frame...\n");
+
+    // Set up text properties
+    nvgBeginPath(x11Window->nvg);
+
+    nvgFontSize(x11Window->nvg, 18.0f);
+    nvgFontFace(x11Window->nvg, "sans");
+    nvgFillColor(x11Window->nvg, nvgRGB(255, 255, 255)); // White color
+    nvgStrokeColor(x11Window->nvg, nvgRGB(0, 0, 0)); // Black color
+    nvgTextAlign(x11Window->nvg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+
+    // Render text
+    nvgText(x11Window->nvg, width / 2.0f,  height / 2.0f, "Hello, NanoVG!", NULL);
+    nvgText(x11Window->nvg, 200,  100, "Hello, NanoVG!", NULL);
+    
+    // draw a translucent circle in the top left
+    nvgBeginPath(x11Window->nvg);
+    nvgCircle(x11Window->nvg, 50, 50, 20);
+    nvgFillColor(x11Window->nvg, nvgRGBA(255, 0, 0, 128)); // Red color with alpha
+    nvgFill(x11Window->nvg);
+    nvgStrokeColor(x11Window->nvg, nvgRGB(0, 0, 0)); // Black color
+    nvgStrokeWidth(x11Window->nvg, 2.0f);
+    nvgStroke(x11Window->nvg);
+
+    // End the NanoVG frame
+    nvgEndFrame(x11Window->nvg);
+
+
 
 }
 

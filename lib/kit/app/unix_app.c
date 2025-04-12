@@ -37,7 +37,8 @@
 ***************************************************************/
 
 static bool exitFlag = false;
-static WindowEventCallback eventCallback = NULL;
+static WindowEventCallback windowEventCallback = NULL;
+static ApplicationEventCallback appEventCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
@@ -47,16 +48,17 @@ static WindowEventCallback eventCallback = NULL;
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunLoop(WindowEventCallback callback)
+int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCallback)
 {
 
-    if (!callback)
+    if (!appCallback || !windowCallback)
     {
         LogError("No callback provided");
         return -1;
     }
 
-    eventCallback = callback;
+    appEventCallback = appCallback;
+    windowEventCallback = windowCallback;
 
     exitFlag = false;
 
@@ -84,8 +86,8 @@ int RunLoop(WindowEventCallback callback)
 
                     BeginPlatformRender((PlatformWindowHandle)window);
 
-                    event.type = EVENT_WINDOW_REDRAW;
-                    (eventCallback)((PlatformWindowHandle)window, event);
+                    event.type = WINDOW_EVENT_REDRAW;
+                    (windowEventCallback)((PlatformWindowHandle)window, event);
             
                     EndPlatformRender((PlatformWindowHandle)window);
                 } break;
@@ -122,10 +124,10 @@ int RunLoop(WindowEventCallback callback)
                     }
 
                     //printf("Mouse moved to (%d, %d)\n", xEvent.xmotion.x, xEvent.xmotion.y);
-                    event.type = EVENT_MOUSE_MOVE;
+                    event.type = WINDOW_EVENT_MOUSE_MOVE;
                     event.mouseMove.x = xEvent.xmotion.x;
                     event.mouseMove.y = xEvent.xmotion.y;
-                    (eventCallback)((PlatformWindowHandle)window, event);
+                    (windowEventCallback)((PlatformWindowHandle)window, event);
                 } break;
 
                 case ConfigureNotify:
@@ -138,7 +140,7 @@ int RunLoop(WindowEventCallback callback)
                     }
 
                     //printf("Window resized to %dx%d\n", xEvent.xconfigure.width, xEvent.xconfigure.height);
-                    event.type = EVENT_WINDOW_RESIZE;
+                    event.type = WINDOW_EVENT_RESIZE;
 
                     window->width = xEvent.xconfigure.width;
                     window->height = xEvent.xconfigure.height;  
@@ -146,7 +148,7 @@ int RunLoop(WindowEventCallback callback)
                     event.windowResize.width = window->width;
                     event.windowResize.height = window->height;
 
-                    (eventCallback)((PlatformWindowHandle)window, event);
+                    (windowEventCallback)((PlatformWindowHandle)window, event);
 
                 } break;
 
@@ -155,8 +157,8 @@ int RunLoop(WindowEventCallback callback)
                 {
                     if (xEvent.xclient.data.l[0] == window->deleteMessage)
                     {
-                        event.type = EVENT_WINDOW_CLOSE;
-                        (eventCallback)((PlatformWindowHandle)window, event);
+                        event.type = WINDOW_EVENT_CLOSE;
+                        (windowEventCallback)((PlatformWindowHandle)window, event);
                     }
                 } break;
 

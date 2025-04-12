@@ -146,7 +146,7 @@ void WinEventCallback(PlatformWindowHandle platformWindow, WindowEvent event)
 
             printf("Window closed\n");
             
-            FreePlatformWindow(window);
+            FreePlatformWindow((PlatformWindowHandle)window);
 
         } break;
 
