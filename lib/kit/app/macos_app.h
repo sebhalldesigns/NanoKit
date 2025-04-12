@@ -2,62 +2,44 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  win32_window.h
-** Module       :  window
+** File         :  macos_app.h
+** Module       :  app
 ** Author       :  SH
-** Created      :  2025-02-23 (YYYY-MM-DD)
+** Created      :  2025-02-15 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Win32 Window Header
+** Description  :  Win32 App Header
 **
 ***************************************************************/
 
-#ifndef MACOS_WINDOW_H
-#define MACOS_WINDOW_H
+#ifndef MACOS_APP_H
+#define MACOS_APP_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-
-#include <extern/glad/glad.h>
-#include <extern/nanovg/src/nanovg.h>
-
-#include <stdbool.h>
-
-#include "platform_window.h"
-
+/* Objective-C imports */
 #import <Cocoa/Cocoa.h>
-#import <OpenGL/gl3.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
 ***************************************************************/
 
+
 /***************************************************************
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef uintptr_t PlatformWindowHandle;
+@interface AppDelegate : NSObject <NSApplicationDelegate>
 
-typedef struct
-{
-    NSWindow *Window;
-    NSView *View;
-    NSOpenGLContext *GLContext;
-   
-    NVGcontext *Nvg;
+- (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
+- (void)applicationWillTerminate:(NSNotification *)aNotification;
 
-    const char *Title;
-    size_t Width;
-    size_t Height;
-
-    void *Data;
-} nkMacOSWindow;
-
+@end
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
 
-#endif /* MACOS_WINDOW_H */
+#endif /* MACOS_APP_H */

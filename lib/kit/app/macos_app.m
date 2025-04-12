@@ -17,13 +17,12 @@
 
 #include "platform_app.h"
 
+#include "macos_app.h"
+
 #include <kit/log/log.h>
 
 #include <stdio.h>
-
-/* Objective-C imports */
-#import <Cocoa/Cocoa.h>
-#import <OpenGL/gl3.h>
+#include <time.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -33,10 +32,21 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-@interface MyOpenGLView : NSOpenGLView
-@property (nonatomic, assign) BOOL isResizing;
-@property (nonatomic, assign) int width;
-@property (nonatomic, assign) int height;
+// Forward declaration of the CVDisplayLink callback
+static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
+                                    const CVTimeStamp *inNow,
+                                    const CVTimeStamp *inOutputTime,
+                                    CVOptionFlags flagsIn,
+                                    CVOptionFlags *flagsOut,
+                                    void *displayLinkContext);
+
+@interface MyOpenGLView : NSView
+{
+    NSOpenGLContext *glContext;
+    CVDisplayLinkRef displayLink;
+}
+- (void)render;
+- (void)updateViewport;
 @end
 
 @interface MyWindowController : NSWindowController <NSWindowDelegate>
@@ -46,14 +56,8 @@
 @end
 
 
-@interface AppDelegate : NSObject <NSApplicationDelegate>
+MyWindowController *windowController;
 
-@property (strong) MyWindowController *windowController;
-
-- (void)applicationDidFinishLaunching:(NSNotification *)aNotification;
-- (void)applicationWillTerminate:(NSNotification *)aNotification;
-
-@end
 
 
 /***************************************************************
@@ -82,6 +86,9 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     appEventCallback = appCallback;
     windowEventCallback = windowCallback;
 
+    windowController = [[MyWindowController alloc] init]; // important to pass nil here.
+    [windowController showWindow:NULL];
+
     @autoreleasepool {
         NSApplication *application = [NSApplication sharedApplication];
         AppDelegate *appDelegate = [[AppDelegate alloc] init];
@@ -108,8 +115,7 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
         appEventCallback(event);
     }
 
-    self.windowController = [[MyWindowController alloc] init]; // important to pass nil here.
-    [self.windowController showWindow:self];
+    
 
 
 }
@@ -129,7 +135,7 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     NSRect frame = NSMakeRect(100, 100, 800, 600);
     NSUInteger style = NSWindowStyleMaskTitled | NSWindowStyleMaskClosable |
                          NSWindowStyleMaskResizable | NSWindowStyleMaskMiniaturizable;
-    
+
     NSWindow *window = [[NSWindow alloc] initWithContentRect:frame
                                                    styleMask:style
                                                      backing:NSBackingStoreBuffered
@@ -139,13 +145,9 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
         [window setTitle:@"OpenGL 3.2 Core Profile Window"];
         [window center];
         window.delegate = self;  // Set delegate to capture window events.
-        
-        // Create the OpenGL view and add it to the window's content.
-        self.glView = [[MyOpenGLView alloc] initWithFrame:window.contentView.bounds];
-        self.glView.layerContentsPlacement = NSViewLayerContentsPlacementTopLeft;
-        self.glView.layerContentsRedrawPolicy = NSViewLayerContentsRedrawDuringViewResize;
 
-        //self.glView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
+        self.glView = [[MyOpenGLView alloc] initWithFrame:window.contentView.bounds];
+        self.glView.autoresizingMask = NSViewWidthSizable | NSViewHeightSizable;
         [window.contentView addSubview:self.glView];
     }
 
@@ -159,10 +161,8 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
 }
 
 - (void)windowDidResize:(NSNotification *)notification {
-
-    [self.glView reshape];
-    [self.glView setNeedsDisplayInRect:self.glView.bounds];
     printf("Window resized\n");
+    [self.glView updateViewport]; // Call updateViewport on resize
 }
 
 @end
@@ -171,75 +171,142 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
 
 @implementation MyOpenGLView
 
-// Override the initializer to set up an OpenGL 3.2 core profile context.
 - (instancetype)initWithFrame:(NSRect)frameRect {
-    // Define attributes for a 3.2 core profile context
-    NSOpenGLPixelFormatAttribute attrs[] = {
-        NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion4_1Core,
-        NSOpenGLPFAColorSize,     24,
-        NSOpenGLPFAAlphaSize,     8,
-        NSOpenGLPFADepthSize,     24,
-        NSOpenGLPFAStencilSize,   8,
-        NSOpenGLPFADoubleBuffer,
-        NSOpenGLPFAAccelerated,
-        0
-    };
-    
-    NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
-    if (!pixelFormat) {
-        NSLog(@"No appropriate pixel format found");
-        return nil;
-    }
-    
-    self = [super initWithFrame:frameRect pixelFormat:pixelFormat];
+    self = [super initWithFrame:frameRect];
     if (self) {
-        // Register for notifications on surface size changes if needed.
-        [[NSNotificationCenter defaultCenter] addObserver:self
-                                                 selector:@selector(viewResized:)
-                                                     name:NSViewFrameDidChangeNotification
-                                                   object:self];
+        // Disable layer-backed drawing (we're doing our own OpenGL rendering)
+        [self setWantsLayer:NO];
+
+        // Set to use the best resolution available (useful for Retina)
+        [self setWantsBestResolutionOpenGLSurface:YES];
+
+        // Create an NSOpenGLPixelFormat (here using a 4.1 core profile)
+        NSOpenGLPixelFormatAttribute attrs[] = {
+            NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion4_1Core,
+            NSOpenGLPFAColorSize,     24,
+            NSOpenGLPFAAlphaSize,     8,
+            NSOpenGLPFADepthSize,     24,
+            NSOpenGLPFAStencilSize,   8,
+            NSOpenGLPFADoubleBuffer,
+            NSOpenGLPFAAccelerated,
+            0
+        };
+
+        NSOpenGLPixelFormat *pixelFormat = [[NSOpenGLPixelFormat alloc] initWithAttributes:attrs];
+        if (!pixelFormat) {
+            NSLog(@"No appropriate pixel format found");
+            return nil;
+        }
+
+        // Create an OpenGL context manually
+        glContext = [[NSOpenGLContext alloc] initWithFormat:pixelFormat shareContext:nil];
+        [glContext setView:self];
+
+        // Set up the display link for continuous rendering
+        CVDisplayLinkCreateWithActiveCGDisplays(&displayLink);
+        CVDisplayLinkSetOutputCallback(displayLink, &DisplayLinkCallback, (__bridge void *)self);
+
+        CGLContextObj cglContext = [glContext CGLContextObj];
+        CGLPixelFormatObj cglPixelFormat = [pixelFormat CGLPixelFormatObj];
+
+        NSWindow *window = [self window];
+        NSScreen *screen = [window screen];
+        NSDictionary *deviceDescription = [screen deviceDescription];
+        NSNumber *screenID = [deviceDescription objectForKey:@"NSScreenNumber"];
+        CGDirectDisplayID displayID = [screenID unsignedIntValue];
+
+        CVDisplayLinkSetCurrentCGDisplay(displayLink, displayID);
+//        CVDisplayLinkSetCurrentCGDisplayFromOpenGLContext(displayLink, cglContext, cglPixelFormat);
+        CVDisplayLinkStart(displayLink);
+
+        [self updateViewport]; // Initial viewport setup
     }
     return self;
 }
 
 - (void)dealloc {
-    [[NSNotificationCenter defaultCenter] removeObserver:self];
+    if (displayLink) {
+        CVDisplayLinkStop(displayLink);
+        CVDisplayLinkRelease(displayLink);
+        displayLink = NULL;
+    }
 }
 
-// Override reshape to update viewport dimensions.
-- (void)reshape {
-    [super reshape];
+- (void)updateViewport {
+    // Make the context current
+    [glContext makeCurrentContext];
+
+    // Update viewport based on the current view bounds
     NSRect bounds = [self bounds];
     glViewport(0, 0, bounds.size.width, bounds.size.height);
+
+    [self render]; // Call render to update the view
 }
 
-// Called when view is resized.
-- (void)viewResized:(NSNotification *)notification {
-    [self reshape];
-    [self setNeedsDisplay:YES];
-}
+// Our custom render method (invoked each frame by the display link)
+- (void)render {
 
-// Override drawRect: for rendering.
-- (void)drawRect:(NSRect)dirtyRect {
+    printf("Rendering...\n");
+
+
+    // Make the context current
+    [glContext makeCurrentContext];
+
+    // Perform OpenGL rendering here
     glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    const GLubyte* version = glGetString(GL_VERSION);
-    NSLog(@"OpenGL version: %s", version);
-    
-    // Insert any additional OpenGL rendering code here.
-    
-    // Flush the buffer after drawing.
-    [[self openGLContext] flushBuffer];
+    // Here you can add your shader and drawing calls…
+
+    // Flush the rendered content to the drawable
+    [glContext flushBuffer];
+
+    // Optionally, log the GL version once:
+    // const GLubyte* ver = glGetString(GL_VERSION);
+    // NSLog(@"GL Version: %s", ver);
 }
 
-// Optionally override input event methods.
-- (void)mouseDown:(NSEvent *)event {
-    NSLog(@"Mouse down at %@", NSStringFromPoint([event locationInWindow]));
-}
-
-- (void)keyDown:(NSEvent *)event {
-    NSLog(@"Key down: %@", [event charactersIgnoringModifiers]);
+// Instead of relying solely on drawRect:, we can force rendering via our custom render method.
+- (void)drawRect:(NSRect)dirtyRect {
+    // Although not used as our primary draw trigger, it is still safe to implement.
+//    [self render];
 }
 
 @end
+
+
+// CVDisplayLink callback function: this runs on a high-priority background thread.
+// We dispatch the render request to the main thread.
+static CVReturn DisplayLinkCallback(CVDisplayLinkRef displayLink,
+                                    const CVTimeStamp *inNow,
+                                    const CVTimeStamp *inOutputTime,
+                                    CVOptionFlags flagsIn,
+                                    CVOptionFlags *flagsOut,
+                                    void *displayLinkContext)
+{
+
+
+    
+    static uint64_t lastTime = 0;
+    uint64_t currentTime = mach_absolute_time();
+    
+    if (lastTime != 0) {
+        mach_timebase_info_data_t timebase;
+        mach_timebase_info(&timebase);
+        
+        uint64_t elapsedNano = (currentTime - lastTime) * timebase.numer / timebase.denom;
+        double elapsedSeconds = (double)elapsedNano / 1e9;
+        NSLog(@"Time between calls: %f seconds", elapsedSeconds);
+    }
+    
+    lastTime = currentTime;
+
+    /*
+    @autoreleasepool {
+        MyOpenGLView *view = (__bridge MyOpenGLView *)displayLinkContext;
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [view render];
+        });
+    }*/
+    return kCVReturnSuccess;
+}
