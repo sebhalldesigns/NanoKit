@@ -18,13 +18,12 @@
 ** MARK: INCLUDES
 ***************************************************************/
 
-
-#include <extern/glad/glad.h>
 #include <extern/nanovg/src/nanovg.h>
 
 #include <stdbool.h>
 
 #include "platform_window.h"
+#include "../app/macos_app.h"
 
 #import <Cocoa/Cocoa.h>
 #import <OpenGL/gl3.h>
@@ -41,10 +40,11 @@ typedef uintptr_t PlatformWindowHandle;
 
 typedef struct
 {
-    NSWindow *Window;
-    NSView *View;
+    NSWindow *nsWindow;
+    NSView *nsView;
     NSOpenGLContext *GLContext;
-   
+    bool hasRendered;
+
     NVGcontext *Nvg;
 
     const char *Title;
@@ -59,5 +59,6 @@ typedef struct
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
+bool GetWindowFromNSWindow(NSWindow *nsWindow, nkMacOSWindow **window);
 
 #endif /* MACOS_WINDOW_H */

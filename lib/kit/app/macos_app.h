@@ -37,6 +37,10 @@
 
 @end
 
+@interface WindowDelegate : NSObject <NSWindowDelegate>
+
+@end
+
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
