@@ -36,7 +36,8 @@
 ***************************************************************/
 
 static bool exitFlag = false;
-static WindowEventCallback eventCallback = NULL;
+static WindowEventCallback windowEventCallback = NULL;
+static ApplicationEventCallback appEventCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
@@ -48,16 +49,17 @@ static BOOL WINAPI ConsoleHandler(DWORD signal);
 ** MARK: PUBLIC FUNCTIONS
 ***************************************************************/
 
-int RunLoop(WindowEventCallback callback)
+int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCallback)
 {
 
-    if (!callback)
+    if (!appCallback || !windowCallback)
     {
         LogError("No callback provided");
         return -1;
     }
 
-    eventCallback = callback;
+    appEventCallback = appCallback;
+    windowEventCallback = windowCallback;
 
     SetConsoleCtrlHandler(ConsoleHandler, TRUE);
     exitFlag = false;
@@ -89,7 +91,12 @@ int RunLoop(WindowEventCallback callback)
 }
 
 LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
+{   
+    if (uMsg == WM_DESTROY)
+    {
+       printf("WM_DESTROY\n");
+    }
+
     nkWin32Window *window = NULL;
     if (!GetWindowFromHwnd(hwnd, &window))
     {
@@ -102,7 +109,7 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         case WM_SIZE:
         {
-            event.type = EVENT_WINDOW_RESIZE;
+            event.type = WINDOW_EVENT_RESIZE;
 
             window->Width = LOWORD(lParam);
             window->Height = HIWORD(lParam);  
@@ -110,13 +117,14 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             event.windowResize.width = window->Width;
             event.windowResize.height = window->Height;
 
-            (eventCallback)((PlatformWindowHandle)window, event);
+            (windowEventCallback)((PlatformWindowHandle)window, event);
         } break;
 
         case WM_CLOSE:
         {
-            event.type = EVENT_WINDOW_CLOSE;
-            (eventCallback)((PlatformWindowHandle)window, event);
+            event.type = WINDOW_EVENT_CLOSE;
+            (windowEventCallback)((PlatformWindowHandle)window, event);
+            DestroyWindow(hwnd);
         } break;
 
         case WM_PAINT:
@@ -124,8 +132,8 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
             
             BeginPlatformRender((PlatformWindowHandle)window);
             
-            event.type = EVENT_WINDOW_REDRAW;
-            (eventCallback)((PlatformWindowHandle)window, event);
+            event.type = WINDOW_EVENT_REDRAW;
+            (windowEventCallback)((PlatformWindowHandle)window, event);
             
             EndPlatformRender((PlatformWindowHandle)window);
 
@@ -133,10 +141,10 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 
         case WM_MOUSEMOVE:
         {
-            event.type = EVENT_MOUSE_MOVE;
+            event.type = WINDOW_EVENT_MOUSE_MOVE;
             event.mouseMove.x = LOWORD(lParam);
             event.mouseMove.y = HIWORD(lParam);
-            (eventCallback)((PlatformWindowHandle)window, event);
+            (windowEventCallback)((PlatformWindowHandle)window, event);
         }  break;
 
         default:

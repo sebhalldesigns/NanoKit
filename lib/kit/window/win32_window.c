@@ -196,6 +196,8 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     window->Nvg = nvgCreateGL3(NVG_ANTIALIAS | NVG_STENCIL_STROKES);
     window->Data = data;
 
+    nvgCreateFont(window->Nvg, "sans", "C:/Windows/Fonts/segoeui.ttf");
+
     windowCount++;
     windows = (nkWin32Window **)realloc(windows, windowCount * sizeof(nkWin32Window));
     windows[windowCount - 1] = window;
@@ -205,6 +207,8 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
 
 void FreePlatformWindow(PlatformWindowHandle window)
 {
+
+    printf("FreePlatformWindow\n");
     if (!window)
     {
         return;
@@ -268,10 +272,42 @@ void BeginPlatformRender(PlatformWindowHandle window)
 
     BeginPaint(win32Window->HWnd, &win32Window->PaintStruct);
 
-    glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
     glViewport(0, 0, win32Window->Width, win32Window->Height);
+
+    float width = win32Window->Width;
+    float height = win32Window->Height;
+
+    nvgBeginFrame(win32Window->Nvg, width, height, 1.0f);
+    printf("Starting frame...\n");
+
+    // Set up text properties
+    nvgBeginPath(win32Window->Nvg);
+
+    nvgFontSize(win32Window->Nvg, 18.0f);
+    nvgFontFace(win32Window->Nvg, "sans");
+    nvgFillColor(win32Window->Nvg, nvgRGB(255, 255, 255)); // White color
+    nvgStrokeColor(win32Window->Nvg, nvgRGB(0, 0, 0)); // Black color
+    nvgTextAlign(win32Window->Nvg, NVG_ALIGN_CENTER | NVG_ALIGN_MIDDLE);
+
+    // Render text
+    nvgText(win32Window->Nvg, width / 2.0f,  height / 2.0f, "Hello, NanoVG!", NULL);
+    nvgText(win32Window->Nvg, 200,  100, "Hello, NanoVG!", NULL);
+    
+    // draw a translucent circle in the top left
+    nvgBeginPath(win32Window->Nvg);
+    nvgCircle(win32Window->Nvg, 50, 50, 20);
+    nvgFillColor(win32Window->Nvg, nvgRGBA(255, 0, 0, 128)); // Red color with alpha
+    nvgFill(win32Window->Nvg);
+    nvgStrokeColor(win32Window->Nvg, nvgRGB(0, 0, 0)); // Black color
+    nvgStrokeWidth(win32Window->Nvg, 2.0f);
+    nvgStroke(win32Window->Nvg);
+
+    // End the NanoVG frame
+    nvgEndFrame(win32Window->Nvg);
+
 
 }
 

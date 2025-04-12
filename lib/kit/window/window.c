@@ -67,7 +67,13 @@ nkWindow *CreateWindow(const char* title, int width, int height)
 
 void DestroyWindow(nkWindow *window)
 {
+    if (window == NULL)
+    {
+        return;
+    }
 
+    FreePlatformWindow(window->PlatformHandle);
+    free(window);
 }
 
 /***************************************************************

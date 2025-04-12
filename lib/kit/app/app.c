@@ -141,6 +141,15 @@ void WinEventCallback(PlatformWindowHandle platformWindow, WindowEvent event)
 
         } break;
 
+        case WINDOW_EVENT_CLOSE:
+        {
+
+            printf("Window closed\n");
+            
+            FreePlatformWindow(window);
+
+        } break;
+
         default:
         {
             /* unhandled event */
