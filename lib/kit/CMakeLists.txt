@@ -103,6 +103,8 @@ add_library(NanoKit STATIC
     app/app.c
     view/view.c
     window/window.c
+
+    library/panels/dockpanel/dockpanel.c
 )
 
 target_link_libraries(NanoKit PRIVATE

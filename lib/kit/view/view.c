@@ -49,17 +49,40 @@ nkView *CreateView()
 {
 
     nkView *view = (nkView *)malloc(sizeof(nkView));
-    view->Frame = (nkRect){0, 0, 0, 0};
-    view->Data = NULL;
-    view->DataSize = 0;
-    view->Parent = NULL;
-    view->Subviews = NULL;
-    view->SubviewCount = 0;
+    if (!view)
+    {
+        LogError("Failed to allocate memory for nkView");
+        return NULL;
+    }
 
-    //view->textureAttachment = 0;
+    view->Name = NULL;
+
+    view->Frame = (nkRect){0, 0, 0, 0};
+    view->SizeRequest = (nkSize){0, 0};
+
+    
+    view->Parent = NULL;
+    view->Sibling = NULL;
+    view->Child = NULL;
+
+    view->StretchType = STRETCH_NONE;
+    view->HorizontalAlignment = ALIGNMENT_CENTER;
+    view->VerticalAlignment = ALIGNMENT_MIDDLE;
+
+    view->DockPosition = DOCK_POSITION_TOP;
+    view->GridLocation = (nkGridLocation){0, 0, 1, 1};
+    view->CanvasRect = (nkRect){0, 0, 0, 0};
+
+    view->MeasureCallback = NULL;
+    view->ArrangeCallback = NULL;
+    view->DrawCallback = NULL;
+    view->DestroyCallback = NULL;
+
+    view->BackgroundColor = COLOR_TRANSPARENT;
+
+    view->Data = NULL;
 
     return view;
-
 }
 
 void DestroyView(nkView *view)
@@ -69,10 +92,7 @@ void DestroyView(nkView *view)
 
 void LayoutView(nkView *view)
 {
-    for (size_t i = 0; i < view->SubviewCount; i++)
-    {
-        LayoutView(&view->Subviews[i]);
-    }
+    
 }
 
 void RenderView(nkView *view)
@@ -95,6 +115,304 @@ void RenderView(nkView *view)
     }
     
 }
+
+/* tree structure functions */
+void AddChildView(nkView *parent, nkView *child)
+{
+    if (parent == NULL || child == NULL)
+    {
+        return;
+    }
+
+    child->Parent = parent;
+
+    if (parent->Child == NULL)
+    {
+        parent->Child = child;
+    }
+    else
+    {
+        nkView *lastChild = parent->Child;
+
+        while (lastChild->Sibling != NULL)
+        {
+            lastChild = lastChild->Sibling;
+        }
+
+        lastChild->Sibling = child;
+    }
+}
+
+void RemoveChildView(nkView *parent, nkView *child)
+{
+    if (parent == NULL || child == NULL)
+    {
+        return;
+    }
+
+    if (parent->Child == child)
+    {
+        parent->Child = child->Sibling;
+    }
+    else
+    {
+        nkView *cursor = parent->Child;
+
+        while (cursor != NULL && cursor->Sibling != child)
+        {
+            cursor = cursor->Sibling;
+        }
+
+        if (cursor != NULL)
+        {
+            cursor->Sibling = child->Sibling;
+        }
+    }
+}
+
+void RemoveView(nkView *view)
+{
+    if (view == NULL || view->Parent == NULL)
+    {
+        return;
+    }
+
+    RemoveChildView(view->Parent, view);    
+
+}
+
+void InsertView(nkView *parent, nkView *child, nkView *before)
+{
+    if (parent == NULL || child == NULL)
+    {
+        return;
+    }
+
+    child->Parent = parent;
+
+    if (before == NULL || parent->Child == NULL)
+    {
+        AddChildView(parent, child);
+        return;
+    }
+
+    if (parent->Child == before)
+    {
+        child->Sibling = before;
+        parent->Child = child;
+        return;
+    }
+
+    nkView *prev = parent->Child;
+    while (prev->Sibling != NULL && prev->Sibling != before)
+    {
+        prev = prev->Sibling;
+    }
+
+    if (prev->Sibling == before)
+    {
+        prev->Sibling = child;
+        child->Sibling = before;
+    }
+    else
+    {
+        /* 'before' not found under parent, add as last child view */
+        AddChildView(parent, child);
+    }
+    
+}
+
+void ReplaceView(nkView *oldView, nkView *newView)
+{
+    if (oldView == NULL || oldView->Parent == NULL || newView == NULL)
+    {
+        return;
+    }
+
+    nkView *parent = oldView->Parent;
+    newView->Parent = parent;
+    newView->Sibling = oldView->Sibling;
+
+    if (parent->Child == oldView)
+    {
+        parent->Child = newView;
+    }
+    else
+    {
+        nkView *prev = parent->Child;
+        while (prev != NULL && prev->Sibling != oldView)
+        {
+            prev = prev->Sibling;
+        }
+
+        if (prev != NULL)
+        {
+            prev->Sibling = newView;
+        }
+    }
+
+    oldView->Parent = NULL;
+    oldView->Sibling = NULL;
+}
+
+
+
+nkView *NextViewInTree(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    if (view->Child != NULL)
+    {
+        return view->Child;
+    }
+    
+    while (view != NULL && view->Sibling == NULL)
+    {
+        view = view->Parent;
+    }
+
+    if (view != NULL)
+    {
+        return view->Sibling;
+    }
+
+    return NULL;
+}
+
+nkView *PreviousViewInTree(nkView *view)
+{
+    if (view == NULL || view->Parent == NULL)
+    {
+        return NULL;
+    }
+
+    nkView *cursor = view->Parent->Child;
+    nkView *prev = NULL;
+
+    while (cursor != NULL && cursor->Sibling != view)
+    {
+        cursor = cursor->Sibling;
+    }
+
+    prev = cursor;
+
+    if (prev != NULL)
+    {
+        while (prev->Child != NULL)
+        {
+            prev = prev->Child;
+            while (prev->Sibling != NULL)
+            {
+                prev = prev->Sibling;
+            }
+        }
+
+        return prev;
+    }
+
+    return view->Parent;
+}
+
+
+nkView *DeepestViewInTree(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    while (view->Child != NULL)
+    {
+        view = view->Child;
+        while (view->Sibling != NULL)
+        {
+            view = view->Sibling;
+        }
+    }
+
+    return view;
+}
+
+nkView *RootViewInTree(nkView *view)
+{
+    while (view != NULL && view->Parent != NULL)
+    {
+        view = view->Parent;
+    }
+
+    return view;
+}
+
+nkView *FirstChildView(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    return view->Child;
+}
+
+nkView *LastChildView(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    nkView *lastChild = view->Child;
+
+    while (lastChild != NULL && lastChild->Sibling != NULL)
+    {
+        lastChild = lastChild->Sibling;
+    }
+
+    return lastChild;
+}
+
+nkView *NextSiblingView(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    if (view->Sibling != NULL)
+    {
+        return view->Sibling;
+    }
+
+    return NULL;
+}
+
+nkView *PreviousSiblingView(nkView *view)
+{
+    if (view == NULL)
+    {
+        return NULL;
+    }
+
+    if (view->Parent != NULL)
+    {
+        nkView *cursor = view->Parent->Child;
+        nkView *prev = NULL;
+
+        while (cursor != NULL && cursor != view)
+        {
+            prev = cursor;
+            cursor = cursor->Sibling;
+        }
+
+        return prev;
+    }
+
+    return NULL;
+}
+
+
 
 /***************************************************************
 ** MARK: STATIC FUNCTIONS

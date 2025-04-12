@@ -51,7 +51,7 @@ typedef struct
     const char *Title;
     nkSize Size;
 
-    nkView *Content;
+    nkView *RootView;
     
     WindowResizeCallback ResizeCallback;
     WindowRenderCallback RenderCallback;
@@ -69,5 +69,8 @@ typedef struct
 nkWindow *CreateWindow(const char *title, int width, int height);
 void UpdateWindow(); /* push changes */
 void DestroyWindow(nkWindow *window);
+
+void LayoutWindow(nkWindow *window);
+void RenderWindow(nkWindow *window);
 
 #endif /* WINDOW_H */

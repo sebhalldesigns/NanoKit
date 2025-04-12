@@ -2,23 +2,23 @@
 **
 ** NanoKit Library Header File
 **
-** File         :  geometry.h
-** Module       :  common
+** File         :  dockpanel.h
+** Module       :  library
 ** Author       :  SH
-** Created      :  2025-02-23 (YYYY-MM-DD)
+** Created      :  2025-04-12 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Shared Geometry Types
+** Description  :  NanoKit DockPanel header file
 **
 ***************************************************************/
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef DOCKPANEL_H
+#define DOCKPANEL_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdint.h>
+#include <view/view.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -30,46 +30,16 @@
 
 typedef struct 
 {
-    float Width;
-    float Height;
-} nkSize;
-
-typedef struct 
-{
-    float X;
-    float Y;
-} nkPoint;
-
-typedef struct 
-{
-    nkPoint Origin;
-    nkSize Size;
-} nkRect;
-
-typedef enum 
-{
-    ALIGNMENT_LEFT,
-    ALIGNMENT_CENTER,
-    ALIGNMENT_RIGHT
-} nkHorizontalAlignment;
-
-typedef enum 
-{
-    ALIGNMENT_TOP,
-    ALIGNMENT_MIDDLE,
-    ALIGNMENT_BOTTOM
-} nkVerticalAlignment;
-
-typedef enum
-{
-    STRETCH_NONE,
-    STRETCH_HORIZONTAL,
-    STRETCH_VERTICAL,
-    STRETCH_BOTH
-} nkStretchType;
+    nkView *View;          /* view */
+    bool LastChildFill;   /* Last child fill */
+} nkDockPanel;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-#endif /* GEOMETRY_H */
+nkDockPanel *nkDockPanel_Create(void);
+
+void nkDockPanel_Destroy(nkDockPanel *dockPanel);
+
+#endif /* DOCKPANEL_H */

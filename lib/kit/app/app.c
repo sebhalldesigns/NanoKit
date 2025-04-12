@@ -26,6 +26,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -113,14 +114,18 @@ void WinEventCallback(PlatformWindowHandle platformWindow, WindowEvent event)
                 (window->ResizeCallback)(window, (nkSize){event.windowResize.width, event.windowResize.height});
             }
 
-            /* resize the root view */
-            if (window->Content)
-            {
-                window->Content->Frame.Size.Width = event.windowResize.width;
-                window->Content->Frame.Size.Height = event.windowResize.height;
+            /* update the window size */
+            window->Size.Width = event.windowResize.width;
+            window->Size.Height = event.windowResize.height;
 
-                LayoutView(window->Content);
-            }
+            clock_t start = clock();
+            
+            /* layout the window */
+            LayoutWindow(window);
+
+            clock_t end = clock();
+            double timeSpent = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
+            printf("Window layout took %.3fms\n", timeSpent);
 
         } break;
 
@@ -134,11 +139,16 @@ void WinEventCallback(PlatformWindowHandle platformWindow, WindowEvent event)
                 (window->RenderCallback)(window);
             }
             
-            if (window->Content)
-            {
-                RenderView(window->Content);
-            }
+            /* layout the window */
+            clock_t start = clock();
 
+            /* render the window */
+            RenderWindow(window);
+
+            clock_t end = clock();
+            double timeSpent = (double)(end - start) / CLOCKS_PER_SEC * 1000.0;
+            printf("Window render took %.3fms\n", timeSpent);
+            
         } break;
 
         case WINDOW_EVENT_CLOSE:

@@ -2,23 +2,23 @@
 **
 ** NanoKit Library Header File
 **
-** File         :  geometry.h
-** Module       :  common
+** File         :  label.h
+** Module       :  library
 ** Author       :  SH
-** Created      :  2025-02-23 (YYYY-MM-DD)
+** Created      :  2025-04-12 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Shared Geometry Types
+** Description  :  NanoKit Label Control header file
 **
 ***************************************************************/
 
-#ifndef GEOMETRY_H
-#define GEOMETRY_H
+#ifndef LABEL_H
+#define LABEL_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <stdint.h>
+#include <view/view.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -30,46 +30,18 @@
 
 typedef struct 
 {
-    float Width;
-    float Height;
-} nkSize;
-
-typedef struct 
-{
-    float X;
-    float Y;
-} nkPoint;
-
-typedef struct 
-{
-    nkPoint Origin;
-    nkSize Size;
-} nkRect;
-
-typedef enum 
-{
-    ALIGNMENT_LEFT,
-    ALIGNMENT_CENTER,
-    ALIGNMENT_RIGHT
-} nkHorizontalAlignment;
-
-typedef enum 
-{
-    ALIGNMENT_TOP,
-    ALIGNMENT_MIDDLE,
-    ALIGNMENT_BOTTOM
-} nkVerticalAlignment;
-
-typedef enum
-{
-    STRETCH_NONE,
-    STRETCH_HORIZONTAL,
-    STRETCH_VERTICAL,
-    STRETCH_BOTH
-} nkStretchType;
+    nkView view;          // Base view
+    char *text;           // Text to display
+    int alignment;        // Text alignment (left, center, right)
+    int padding;          // Padding around the text
+} nkLabel;
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-#endif /* GEOMETRY_H */
+nkLabel *nkLabel_Create(void);
+
+void nkLabel_Destroy(nkLabel *label);
+
+#endif /* LIBRARY_H */

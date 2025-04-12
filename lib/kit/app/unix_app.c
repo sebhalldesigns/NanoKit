@@ -69,6 +69,11 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     nkUnixWindow *window = NULL;
     WindowEvent event = {0};
 
+    /* call application launched */
+    ApplicationEvent appEvent = {0};
+    appEvent.type = APPLICATION_EVENT_LAUNCHED;
+    appEventCallback(appEvent);
+
     printf("Entering event loop\n");
 
     while (!exitFlag)
@@ -84,12 +89,12 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
                 {
                     printf("Window exposed\n");
 
-                    BeginPlatformRender((PlatformWindowHandle)window);
+                    //BeginPlatformRender((PlatformWindowHandle)window);
 
                     event.type = WINDOW_EVENT_REDRAW;
                     (windowEventCallback)((PlatformWindowHandle)window, event);
             
-                    EndPlatformRender((PlatformWindowHandle)window);
+                    //EndPlatformRender((PlatformWindowHandle)window);
                 } break;
 
                 case KeyPress:

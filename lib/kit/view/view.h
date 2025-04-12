@@ -23,6 +23,7 @@
 #include <stddef.h>
 
 #include "../common/geometry.h"
+#include "../common/color.h"
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -32,8 +33,12 @@
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef void (*ViewLayoutCallback)(void *view); /* possibly have layoutdown and layoutup like WPF? */
-typedef void (*ViewDrawCallback)(void *view);
+struct nkView; /* forward declaration */
+
+typedef void (*ViewMeasureCallback)(struct nkView *view); 
+typedef void (*ViewArrangeCallback)(struct nkView *view);
+typedef void (*ViewDrawCallback)(struct nkView *view); 
+typedef void (*ViewDestroyCallback)(struct nkView *view); /* called when view is destroyed */
 
 typedef enum
 {
@@ -41,27 +46,49 @@ typedef enum
     DOCK_POSITION_BOTTOM,
     DOCK_POSITION_LEFT,
     DOCK_POSITION_RIGHT
-} DockPosition;
+} nkDockPosition;
 
-typedef struct View
+typedef struct
+{
+    size_t Row;
+    size_t Column;
+    size_t RowSpan;
+    size_t ColumnSpan;
+} nkGridLocation;
+
+
+typedef struct nkView
 {    
+
+    const char* Name; /* name of the view */
+
     nkRect Frame; /* overwritten in layout phase */
-    
     nkSize SizeRequest;
 
-    struct View *Parent; /* can be NULL*/
+    /* tree structure handles */
+    struct nkView *Parent; /* can be NULL*/
+    struct nkView *Sibling; /* can be NULL*/
+    struct nkView *Child; /* can be NULL*/
+
+    /* Generic layout requests to parent */
+    nkStretchType StretchType;
+    nkHorizontalAlignment HorizontalAlignment;
+    nkVerticalAlignment VerticalAlignment;
+
+    /* Parent panel specific requests */
+    nkDockPosition DockPosition;
+    nkGridLocation GridLocation;
+    nkRect CanvasRect;
     
-    size_t SubviewCount;
-    struct View *Subviews; /* can be NULL*/
-
-    DockPosition DockPosition;
-
-    ViewLayoutCallback LayoutCallback; /* called when layout is needed */
+    /* callbacks */
+    ViewMeasureCallback MeasureCallback;
+    ViewArrangeCallback ArrangeCallback;
     ViewDrawCallback DrawCallback; /* called when view should be drawn */
+    ViewDestroyCallback DestroyCallback; /* called when view is destroyed */
 
+    nkColor BackgroundColor;
 
     void *Data;
-    size_t DataSize;
 
 } nkView;
 
@@ -71,6 +98,8 @@ typedef struct View
 ***************************************************************/
 
 nkView *CreateView(void);
+
+/* detroys view and all children */
 void DestroyView(nkView *view);
 
 /* called by system on window resize */
@@ -78,5 +107,29 @@ void LayoutView(nkView *view);
 
 /* called by system when view should be rendered */
 void RenderView(nkView *view);
+
+/* VIEW TREE MANAGEMENT */
+
+void AddChildView(nkView *parent, nkView *child);
+void RemoveChildView(nkView *parent, nkView *child);
+void RemoveView(nkView *view);
+void InsertView(nkView *parent, nkView *child, nkView *before);
+void ReplaceView(nkView *oldView, nkView *newView);
+
+
+/* TREE TRAVERSAL */
+
+nkView *NextViewInTree(nkView *view);
+nkView *PreviousViewInTree(nkView *view);
+nkView *DeepestViewInTree(nkView *view);
+nkView *RootViewInTree(nkView *view);
+nkView *FirstChildView(nkView *view);
+nkView *LastChildView(nkView *view);
+nkView *NextSiblingView(nkView *view);
+nkView *PreviousSiblingView(nkView *view);
+
+
+
+
 
 #endif /* VIEW_H */

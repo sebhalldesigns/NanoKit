@@ -21,6 +21,8 @@
 
 #include "window/window.h"  
 #include "app/app.h"
+#include "view/view.h"
+#include "library/library.h"
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
