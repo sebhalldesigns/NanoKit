@@ -136,15 +136,15 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     
     NSRect frame = [nsWindow frame];
 
-    window->Width = frame.size.width;
-    window->Height = frame.size.height;
+    window->Width = nsWindow.contentView.bounds.size.width;
+    window->Height = nsWindow.contentView.bounds.size.height;
 
     if (windowEventCallback) 
     {
         WindowEvent event;
         event.type = WINDOW_EVENT_RESIZE;
-        event.windowResize.width = frame.size.width;
-        event.windowResize.height = frame.size.height;
+        event.windowResize.width = nsWindow.contentView.bounds.size.width;
+        event.windowResize.height = nsWindow.contentView.bounds.size.height;
 
         windowEventCallback((PlatformWindowHandle)window, event);
     }
@@ -167,7 +167,7 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     
     if (GetWindowFromNSWindow(nsWindow, &window)) {
         // Disable VSync during resize for smoother resizing
-        [window->GLContext setValues:(const int[]){0} forParameter:NSOpenGLContextParameterSwapInterval];
+        //[window->GLContext setValues:(const int[]){0} forParameter:NSOpenGLContextParameterSwapInterval];
     }
 }
 
@@ -180,11 +180,12 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
     
     if (GetWindowFromNSWindow(nsWindow, &window)) {
         // Re-enable VSync after resize
-        [window->GLContext setValues:(const int[]){1} forParameter:NSOpenGLContextParameterSwapInterval];
+        //[window->GLContext setValues:(const int[]){1} forParameter:NSOpenGLContextParameterSwapInterval];
         
         // Force complete redraw
-        //BeginPlatformRender((PlatformWindowHandle)window);
-        //EndPlatformRender((PlatformWindowHandle)window);
+        BeginPlatformRender((PlatformWindowHandle)window);
+        // Perform rendering here
+        EndPlatformRender((PlatformWindowHandle)window);
     }
 
 

@@ -41,7 +41,7 @@ typedef uintptr_t PlatformWindowHandle;
 typedef struct
 {
     NSWindow *nsWindow;
-    NSView *nsView;
+    NSOpenGLView *nsOpenGLView;
     NSOpenGLContext *GLContext;
     bool hasRendered;
 

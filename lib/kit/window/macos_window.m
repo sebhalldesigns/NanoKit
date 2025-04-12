@@ -69,7 +69,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
     }
 
     NSWindow *nsWindow = NULL;
-    NSView *contentView = NULL;
+    NSOpenGLView *nsOpenGLView = NULL;
     NSOpenGLContext *glContext = NULL;
 
     @autoreleasepool {
@@ -98,24 +98,7 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
         [nsWindow setTitle:[NSString stringWithUTF8String:title]];
 
         nsWindow.delegate = windowDelegate;
-        nsWindow.preservesContentDuringLiveResize = NO;
-
-        contentView = [NSView alloc];
-        if (!contentView)
-        {
-            LogError("Failed to create content view");
-            return 0;
-        }
-
-        contentView = [contentView initWithFrame:nsWindow.contentView.bounds];
-
-        [contentView setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
-        [contentView setWantsLayer: YES];
-//        [contentView setWantsBestResolutionOpenGLSurface: YES];
-        [contentView setLayerContentsPlacement: NSViewLayerContentsPlacementTopLeft];
-        [contentView setLayerContentsRedrawPolicy: NSViewLayerContentsRedrawNever];
-
-
+//        nsWindow.preservesContentDuringLiveResize = NO;
 
         NSOpenGLPixelFormatAttribute attrs[] = {
             NSOpenGLPFAOpenGLProfile, NSOpenGLProfileVersion4_1Core,
@@ -142,20 +125,38 @@ PlatformWindowHandle InitPlatformWindow(const char *title, size_t width, size_t 
             return 0;
         }
 
-        [glContext setValues:(const int[]){NSOpenGLContextParameterSwapInterval, 1} forParameter:NSOpenGLContextParameterSwapInterval];
 
-        [glContext setView:contentView];
-        
+        nsOpenGLView = [NSOpenGLView alloc];
+        if (!nsOpenGLView)
+        {
+            LogError("Failed to create content view");
+            return 0;
+        }
+
+        nsOpenGLView = [nsOpenGLView initWithFrame:nsWindow.contentView.bounds pixelFormat:pixelFormat];
+
+
+        [nsOpenGLView setWantsBestResolutionOpenGLSurface: YES];
+        [nsOpenGLView setAutoresizingMask: NSViewWidthSizable | NSViewHeightSizable];
+        [nsOpenGLView setOpenGLContext:glContext];
+
+        [nsOpenGLView setLayerContentsPlacement: NSViewLayerContentsPlacementTopLeft];
+        [nsOpenGLView setLayerContentsRedrawPolicy: NSViewLayerContentsRedrawNever];
+
+        /* disable vsync */
+        [glContext setValues:(const int[]){0} forParameter:NSOpenGLContextParameterSwapInterval];
+
+
         [glContext makeCurrentContext];
 
-        [nsWindow setContentView:contentView];
+        [nsWindow setContentView:nsOpenGLView];
     }
 
     printf("InitPlatformWindow: %s\n", title);
 
     nkMacOSWindow *window = (nkMacOSWindow *)malloc(sizeof(nkMacOSWindow));
     window->nsWindow = nsWindow;
-    window->nsView = contentView;
+    window->nsOpenGLView = nsOpenGLView;
     window->GLContext = glContext;
 
     window->Title = title;

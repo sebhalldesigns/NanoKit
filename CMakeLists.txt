@@ -9,12 +9,6 @@ endif()
 add_subdirectory(tools)
 add_subdirectory(lib)
 
-
-
-
-
-
-
 option(BUILD_EXAMPLE "Build the Example executable" OFF)
 
 if(BUILD_EXAMPLE)
