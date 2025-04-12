@@ -33,7 +33,7 @@ fi
 
 # run cmake build
 #cmake --build build
-if [-f build/macos_ios_build ]; then
+if [ -f build/macos_ios_build ]; then
     rm build/macos_ios_build
 fi
 

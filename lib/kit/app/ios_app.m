@@ -5,7 +5,7 @@
 ** File         :  ios_app.m
 ** Module       :  app
 ** Author       :  SH
-** Created      :  2025-04-11 (YYYY-MM-DD)
+** Created      :  2025-04-12 (YYYY-MM-DD)
 ** License      :  MIT
 ** Description  :  iOS App Implementation
 **
@@ -17,9 +17,15 @@
 
 #include "platform_app.h"
 
+#include "ios_app.h"
+
+
+#include "../window/platform_window.h"
+
 #include <kit/log/log.h>
 
 #include <stdio.h>
+#include <time.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
@@ -33,8 +39,8 @@
 ** MARK: STATIC VARIABLES
 ***************************************************************/
 
-static WindowEventCallback windowCallback = NULL;
-static ApplicationEventCallback appCallback = NULL;
+static WindowEventCallback windowEventCallback = NULL;
+static ApplicationEventCallback appEventCallback = NULL;
 
 /***************************************************************
 ** MARK: STATIC FUNCTION DEFS
@@ -46,14 +52,19 @@ static ApplicationEventCallback appCallback = NULL;
 
 int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCallback)
 {
-    if (!callback)
+    if (!appCallback || !windowCallback)
     {
         LogError("No callback provided");
         return -1;
     }
 
-    eventCallback = callback;
+    appEventCallback = appCallback;
+    windowEventCallback = windowCallback;
 
+    @autoreleasepool {
+        // UIApplicationMain sets up the app and starts the event loop
+        return UIApplicationMain(0, NULL, NULL, NSStringFromClass([AppDelegate class]));
+    }
 
     return 0;
 
@@ -63,3 +74,18 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
 ** MARK: STATIC FUNCTIONS
 ***************************************************************/
 
+@implementation AppDelegate
+
+- (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
+    
+    if (appEventCallback) {
+
+        ApplicationEvent event;
+        event.type = APPLICATION_EVENT_LAUNCHED;
+
+        appEventCallback(event);
+    }
+}
+
+
+@end

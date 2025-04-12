@@ -2,63 +2,42 @@
 **
 ** NanoKit Platform Abstraction Layer Header File
 **
-** File         :  macos_window.h
-** Module       :  window
+** File         :  ios_app.h
+** Module       :  app
 ** Author       :  SH
 ** Created      :  2025-04-12 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  macOS Window Header
+** Description  :  iOS App Header
 **
 ***************************************************************/
 
-#ifndef MACOS_WINDOW_H
-#define MACOS_WINDOW_H
+#ifndef IOS_APP_H
+#define IOS_APP_H
 
 /***************************************************************
 ** MARK: INCLUDES
 ***************************************************************/
 
-#include <extern/nanovg/src/nanovg.h>
-
-#include <stdbool.h>
-
-#include "platform_window.h"
-#include "../app/macos_app.h"
-
-#import <Cocoa/Cocoa.h>
-#import <OpenGL/gl3.h>
+/* Objective-C imports */
+#import <UIKit/UIKit.h>
 
 /***************************************************************
 ** MARK: CONSTANTS & MACROS
 ***************************************************************/
 
+
 /***************************************************************
 ** MARK: TYPEDEFS
 ***************************************************************/
 
-typedef uintptr_t PlatformWindowHandle;
+@interface AppDelegate : UIResponder <UIApplicationDelegate>
 
-typedef struct
-{
-    NSWindow *nsWindow;
-    NSOpenGLView *nsOpenGLView;
-    NSOpenGLContext *GLContext;
-    bool hasRendered;
+@property (strong, nonatomic) UIWindow *window;
 
-    NVGcontext *Nvg;
-
-    const char *Title;
-    size_t Width;
-    size_t Height;
-
-    void *Data;
-} nkMacOSWindow;
-
+@end
 
 /***************************************************************
 ** MARK: FUNCTION DEFS
 ***************************************************************/
 
-bool GetWindowFromNSWindow(NSWindow *nsWindow, nkMacOSWindow **window);
-
-#endif /* MACOS_WINDOW_H */
+#endif /* IOS_APP_H */

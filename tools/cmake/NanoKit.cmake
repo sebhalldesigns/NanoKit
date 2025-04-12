@@ -11,7 +11,7 @@ function(generate_modules target)
     set(GEN_DIR "${CMAKE_BINARY_DIR}/generated")
     file(MAKE_DIRECTORY "${GEN_DIR}")
     
-    if(EMSCRIPTEN)
+    if(EMSCRIPTEN OR DEFINED BUILD_IOS)
         # Set the nkgen executable path for Emscripten
         set(NKGEN "${CMAKE_BINARY_DIR}/nkgen/nkgen")
     else()

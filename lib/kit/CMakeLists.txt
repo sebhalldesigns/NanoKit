@@ -49,14 +49,17 @@ elseif(DEFINED BUILD_IOS)
     message("    - DETECTED IOS")
 
     set(PLATFORM_SOURCE
-        window/ios_window.c
-        app/ios_app.c
+        window/ios_window.m
+        app/ios_app.m
     )
     
     set(PLATFORM_DEPENDENCIES
         "-framework Foundation"
         "-framework UIKit"
     )
+
+    add_compile_definitions(GLES_SILENCE_DEPRECATION)
+
 
 elseif(APPLE)
 

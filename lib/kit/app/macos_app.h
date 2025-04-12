@@ -5,9 +5,9 @@
 ** File         :  macos_app.h
 ** Module       :  app
 ** Author       :  SH
-** Created      :  2025-02-15 (YYYY-MM-DD)
+** Created      :  2025-04-12 (YYYY-MM-DD)
 ** License      :  MIT
-** Description  :  Win32 App Header
+** Description  :  macOS App Header
 **
 ***************************************************************/
 
