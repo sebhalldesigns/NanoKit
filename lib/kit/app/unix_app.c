@@ -138,6 +138,20 @@ int RunLoop(ApplicationEventCallback appCallback, WindowEventCallback windowCall
                 case ConfigureNotify:
                 {
 
+                    /* Coalesce multiple ConfigureNotify events to avoid flooding */
+                    while (XEventsQueued(display, QueuedAfterReading) > 0) 
+                    {
+                        XEvent nextEvent;
+                        XPeekEvent(display, &nextEvent);
+                        if (nextEvent.type != ConfigureNotify)
+                        {
+                            break;
+                        }
+                            
+                        /* Consume the next ConfigureNotify event. */
+                        XNextEvent(display, &xEvent);
+                    }
+
                     /* ignore repeat size requests */
                     if (window->width == xEvent.xconfigure.width && window->height == xEvent.xconfigure.height)
                     {
