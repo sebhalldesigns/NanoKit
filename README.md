@@ -1,2 +1,2 @@
 # NanoKit
-A Collection of Cross-Platform Libraries for App Development
+NanoKit - A Collection of Cross-Platform Libraries for App Development

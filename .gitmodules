@@ -1,0 +1,12 @@
+[submodule "NanoWin"]
+	path = NanoWin
+	url = https://github.com/sebhalldesigns/NanoWin.git
+[submodule "NanoDraw"]
+	path = NanoDraw
+	url = https://github.com/sebhalldesigns/NanoDraw.git
+[submodule "NanoView"]
+	path = NanoView
+	url = https://github.com/sebhalldesigns/NanoView.git
+[submodule "NKGen"]
+	path = NKGen
+	url = https://github.com/sebhalldesigns/NKGen.git
