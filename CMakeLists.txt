@@ -1,8 +1,6 @@
 cmake_minimum_required(VERSION 3.10)
 
 include(ExternalProject)
-    
-add_subdirectory(NanoWin)
 
 if(EMSCRIPTEN OR DEFINED BUILD_IOS)
     ExternalProject_Add(nkgen
@@ -20,3 +18,21 @@ if(EMSCRIPTEN OR DEFINED BUILD_IOS)
 else()
     add_subdirectory(NKGen)
 endif()
+
+add_subdirectory(NanoDraw)
+add_subdirectory(NanoWin)
+
+project(NanoKit)
+
+add_library(NanoKit STATIC
+    lib/nanokit.c
+)
+
+target_include_directories(NanoKit PUBLIC
+    ${CMAKE_CURRENT_LIST_DIR}/lib
+)
+
+target_link_libraries(NanoKit PUBLIC
+    #NanoDraw
+    NanoWin
+)
