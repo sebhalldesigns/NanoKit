@@ -33,6 +33,6 @@ target_include_directories(NanoKit PUBLIC
 )
 
 target_link_libraries(NanoKit PUBLIC
-    #NanoDraw
+    NanoDraw
     NanoWin
 )
