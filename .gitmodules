@@ -10,3 +10,6 @@
 [submodule "NKGen"]
 	path = NKGen
 	url = https://github.com/sebhalldesigns/NKGen.git
+[submodule "NKFonts"]
+	path = NKFonts
+	url = https://github.com/sebhalldesigns/NKFonts.git
