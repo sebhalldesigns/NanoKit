@@ -37,6 +37,7 @@ else()
 endif()
 
 add_subdirectory(NanoDraw)
+add_subdirectory(NanoView)
 add_subdirectory(NanoWin)
 
 project(NanoKit)
@@ -52,6 +53,7 @@ target_include_directories(NanoKit PUBLIC
 target_link_libraries(NanoKit PUBLIC
     NanoDraw
     NanoWin
+    NanoView
 )
 
 embed_resources(NanoKit
