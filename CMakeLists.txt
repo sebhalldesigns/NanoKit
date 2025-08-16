@@ -19,7 +19,7 @@ endfunction()
 
 include(ExternalProject)
 
-if(EMSCRIPTEN OR DEFINED BUILD_IOS)
+if(DEFINED BUILD_IOS)
     ExternalProject_Add(nkgen
         SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/nkgen
         BINARY_DIR ${CMAKE_BINARY_DIR}/nkgen
@@ -30,6 +30,17 @@ if(EMSCRIPTEN OR DEFINED BUILD_IOS)
             -DCMAKE_TOOLCHAIN_FILE=  # empty toolchain = native
             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/nkgen
             -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=${CMAKE_BINARY_DIR}/nkgen
+        INSTALL_COMMAND ""  # <- This disables the install step
+    )
+elseif(EMSCRIPTEN)
+    ExternalProject_Add(nkgen
+        SOURCE_DIR ${CMAKE_CURRENT_LIST_DIR}/nkgen
+        BINARY_DIR ${CMAKE_BINARY_DIR}/nkgen
+        CMAKE_ARGS
+            -DCMAKE_BUILD_TYPE=Release
+            -DCMAKE_RUNTIME_OUTPUT_DIRECTORY=${CMAKE_BINARY_DIR}/nkgen
+            -DCMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG=${CMAKE_BINARY_DIR}/nkgen
+            -DCMAKE_TOOLCHAIN_FILE:UNSET=
         INSTALL_COMMAND ""  # <- This disables the install step
     )
 else()
